@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="MeterControls.BarControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Height="190" Width="80">
+    <Grid Margin="0,0,0,0">
+        <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,165,0,5" TextWrapping="Wrap" Text="Title" VerticalAlignment="Center"  Width="65" Name="tbTitle" TextAlignment="Center"/>
+        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="150" Margin="10,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="30"/>
+        <TextBlock HorizontalAlignment="Left" Height="20" Margin="45,140,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="26"/>
+        <TextBlock HorizontalAlignment="Left" Height="20" Margin="45,75,0,0" TextWrapping="Wrap" Text="50" VerticalAlignment="Top" Width="26"/>
+        <TextBlock HorizontalAlignment="Left" Height="20" Margin="45,10,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="26"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,145,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter01"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,131,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter02"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,117,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter03"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,103,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter04"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,88,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter05"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,73,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter06"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,58,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter07"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,43,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter08"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,28,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter09"/>
+        <Rectangle Fill="White" HorizontalAlignment="Left" Height="13" Margin="12,13,0,0" Stroke="Magenta" VerticalAlignment="Top" Width="26" Name="BarMeter10"/>
+
+    </Grid>
+</UserControl>

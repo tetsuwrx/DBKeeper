@@ -1,0 +1,10 @@
+﻿<Window x:Class="DBKeeper.SessionDetail"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="セッション詳細" Height="299" Width="300" WindowStartupLocation="CenterOwner">
+    <Grid Margin="0,0,0,-14">
+        <TextBox Name="SessionDetailText" TextWrapping="Wrap" Margin="10,10,10,53" Width="auto" Height="auto" IsReadOnly="True"/>
+        <Button Content="強制終了" Name="KillSessionButton" Margin="0,0,91,23" HorizontalAlignment="Right" Width="76" Height="25" VerticalAlignment="Bottom" Click="KillSessionButton_Click"/>
+        <Button Content="閉じる" x:Name="CloseButton" Margin="0,0,10,23" Click="CloseButton_Click" HorizontalAlignment="Right" Width="76" Height="25" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>
