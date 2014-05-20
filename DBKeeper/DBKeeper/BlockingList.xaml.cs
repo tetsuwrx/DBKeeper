@@ -220,6 +220,7 @@ namespace DBKeeper
                     if (m_table_session_list.Rows[i]["session_id"].ToString() == sessionIdList[j].ToString())
                     {
                         m_table_session_list.Rows[i].SetField("isblocked", true);
+                        break;
                     }
                     else
                     {
@@ -311,7 +312,7 @@ namespace DBKeeper
             sessionDetail.ShowDialog();
 
             // 帰ってきたら再描画
-            RefleshWindow();
+            //RefleshWindow();
         }
 
         /// <summary>

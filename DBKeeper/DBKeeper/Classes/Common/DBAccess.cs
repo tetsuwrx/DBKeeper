@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections;
 
 namespace DBKeeper.Classes.Common
 {
@@ -167,7 +168,6 @@ namespace DBKeeper.Classes.Common
 
             string dataValue = "";              // DBから取得した値
             
-            /*
             selectSQL = "select perfCount.object_name" + "\n";
             selectSQL += "     , perfCount.counter_name" + "\n";
             selectSQL += "     , perfCount.instance_name" + "\n";
@@ -186,9 +186,10 @@ namespace DBKeeper.Classes.Common
             selectSQL += "    on perfCount.Object_name = perfBase.Object_name" + "\n";
             selectSQL += "   and perfCount.instance_name = perfBase.instance_name" + "\n";
             selectSQL += " where perfCount.instance_name = 'default';";
-             * */
-
+            
+            /*
             selectSQL = "exec sp_monitor;";
+             * */
 
             System.Diagnostics.Debug.WriteLine(selectSQL);
 
@@ -196,6 +197,7 @@ namespace DBKeeper.Classes.Common
 
             if (errorMessage == "")
             {
+                /* sp_monitor で取得した場合の処理
                 dataTable = dataSet.Tables[1];
                 dataValue = dataTable.Rows[0]["cpu_busy"].ToString();
 
@@ -209,6 +211,16 @@ namespace DBKeeper.Classes.Common
                 else
                 {
                     retValue = double.Parse(tmpVal);
+                }
+                 * */
+                dataTable = dataSet.Tables[0];
+                dataValue = dataTable.Rows[0]["cntr_Value"].ToString();
+
+                retValue = double.Parse(dataValue);
+
+                if (retValue > 100)
+                {
+                    retValue = 100;
                 }
 
             }
@@ -426,11 +438,12 @@ namespace DBKeeper.Classes.Common
         }
 
         /// <summary>
-        /// ブロッキング数の取得
+        /// ブロッキングセッション数の取得
         /// </summary>
         /// <param name="CurrentConnectionString">対象の接続文字列</param>
-        /// <returns>プロシージャキャッシュヒット率</returns>
-        public int GetBlockingCount(string CurrentConnectionString)
+        /// <param name="refBlockingSidList">ブロッキングリスト</param>
+        /// <returns>ブロッキングセッション数</returns>
+        public int GetBlockingCount(string CurrentConnectionString, ref ArrayList refBlockingSidList)
         {
             int retValue = 0;                // 戻り値用
             string selectSQL = "";              // 取得用SQL
@@ -438,7 +451,9 @@ namespace DBKeeper.Classes.Common
             DataSet dataSet = new DataSet();
             DataTable dataTable = new DataTable();
 
-            string dataValue = "";              // DBから取得した値
+            // string dataValue = "";              // DBから取得した値
+
+            ArrayList blockingList = new ArrayList();               // ブロッキングセッションIDのリスト
 
             /*
             selectSQL = "declare @BlockingInfo table (" + "\n";
@@ -486,7 +501,7 @@ namespace DBKeeper.Classes.Common
             selectSQL += ";";
              * */
 
-            selectSQL =  "select count(1)" + "\n";
+            selectSQL = "select blocking_session_id" + "\n";
             selectSQL += "  from sys.dm_os_waiting_tasks" + "\n";
             selectSQL += " where blocking_session_id > 50;";
 
@@ -497,14 +512,24 @@ namespace DBKeeper.Classes.Common
                 if (dataSet.Tables.Count > 0)
                 {
                     dataTable = dataSet.Tables[0];
-                    dataValue = dataTable.Rows[0][0].ToString();
 
-                    retValue = int.Parse(dataValue);
+                    for (int i = 0; i < dataTable.Rows.Count; i++)
+                    {
+                        // ブロッキングセッションIDをArrayListに蓄積
+                        blockingList.Add(dataTable.Rows[i]["blocking_session_id"].ToString());
+                    }
+
+                    // dataValue = dataTable.Rows[0][0].ToString();
+                    // retValue = int.Parse(dataValue);
+                    retValue = dataTable.Rows.Count;
                 }
             }
 
             dataSet.Dispose();
             dataTable.Dispose();
+
+            // ブロッキングリストを渡す
+            refBlockingSidList = blockingList;
 
             return retValue;
         }

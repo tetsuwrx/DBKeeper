@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using DBKeeper.Classes.Common;
 using System.Windows.Threading;
 using System.Threading;
+using System.Collections;
 
 namespace DBKeeper
 {
@@ -45,6 +46,22 @@ namespace DBKeeper
         bool monitor03Running = true;
         bool monitor04Running = true;
 
+        ArrayList currentBlockingSidList01 = new ArrayList();                    // ブロッキングSIDリスト
+        ArrayList currentBlockingSidList02 = new ArrayList();                    // ブロッキングSIDリスト
+        ArrayList currentBlockingSidList03 = new ArrayList();                    // ブロッキングSIDリスト
+        ArrayList currentBlockingSidList04 = new ArrayList();                    // ブロッキングSIDリスト
+
+        Hashtable chkBlockingSidList01 = new Hashtable();                       // ブロッキングSIDリスト(チェック用)
+        Hashtable chkBlockingSidList02 = new Hashtable();                       // ブロッキングSIDリスト(チェック用)
+        Hashtable chkBlockingSidList03 = new Hashtable();                       // ブロッキングSIDリスト(チェック用)
+        Hashtable chkBlockingSidList04 = new Hashtable();                       // ブロッキングSIDリスト(チェック用)
+
+        Hashtable bufBlockingSidList01 = new Hashtable();                       // ブロッキングSIDリストの退避先
+        Hashtable bufBlockingSidList02 = new Hashtable();                       // ブロッキングSIDリストの退避先
+        Hashtable bufBlockingSidList03 = new Hashtable();                       // ブロッキングSIDリストの退避先
+        Hashtable bufBlockingSidList04 = new Hashtable();                       // ブロッキングSIDリストの退避先
+
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -273,7 +290,7 @@ namespace DBKeeper
             string memoryText = "";                     // メモリ使用量のテキスト表示用
 
             bool isChecked = false;                     // チェックしたかどうか
-
+            
             System.Diagnostics.Debug.WriteLine("Server01Monitoring Start:" + DateTime.Now.ToString());
 
             // ================================================================
@@ -339,8 +356,77 @@ namespace DBKeeper
             if (timeSpan >= CommonServer01Settings.BlockingCheckCycle)
             {
                 // ブロッキング数の取得
-                blockingCount = dbAccess.GetBlockingCount(CommonServer01Settings.ConnectionString);
-                BlockingAlert01.CheckBlockingAlert(blockingCount);
+                blockingCount = dbAccess.GetBlockingCount(CommonServer01Settings.ConnectionString, ref currentBlockingSidList01);
+
+                bool isHited = false;                       // ヒットしたかどうか
+
+                for (int i = 0; i < currentBlockingSidList01.Count; i++)
+                {
+                    // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
+                    if (!chkBlockingSidList01.ContainsKey(currentBlockingSidList01[i].ToString()))
+                    {
+                        chkBlockingSidList01.Add(currentBlockingSidList01[i].ToString(), 1);
+                    }
+                    else
+                    {
+                        // 含まれていた場合はカウンタをインクリメント
+                        string keySid = currentBlockingSidList01[i].ToString();
+
+                        int currentValue = (int)chkBlockingSidList01[keySid] + 1;
+
+                        chkBlockingSidList01[keySid] = currentValue;
+
+                    }
+                }
+
+                if (currentBlockingSidList01.Count == 0)
+                {
+                    chkBlockingSidList01.Clear();
+                }
+
+                // ブロッキングリストをコピー
+                bufBlockingSidList01 = (Hashtable)chkBlockingSidList01.Clone();
+
+                // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
+                
+
+                foreach (string key in chkBlockingSidList01.Keys)
+                {
+                    // フラグ初期化
+                    isHited = false;
+
+                    for (int i = 0; i < currentBlockingSidList01.Count; i++)
+                    {
+                            
+                        if (key == currentBlockingSidList01[i].ToString())
+                        {
+                            isHited = true;                                 // フラグを立てる
+                            break;
+                        }
+                    }
+
+                    if (isHited == false)
+                    {
+                        bufBlockingSidList01.Remove(key);
+                    }
+                }
+
+                // ブロキングリスト(退避)から複製
+                chkBlockingSidList01.Clear();
+                chkBlockingSidList01 = (Hashtable)bufBlockingSidList01.Clone();
+
+                int maxBlockingCount = 0;
+
+                // ブロッキング取得回数の最大値を検索
+                foreach (string key in chkBlockingSidList01.Keys)
+                {
+                    if (maxBlockingCount < (int)chkBlockingSidList01[key])
+                    {
+                        maxBlockingCount = (int)chkBlockingSidList01[key];
+                    }
+                }
+
+                BlockingAlert01.CheckBlockingAlert(maxBlockingCount);
 
                 isChecked = true;
             }
@@ -442,8 +528,77 @@ namespace DBKeeper
             if (timeSpan >= CommonServer02Settings.CpuCheckCycle)
             {
                 // ブロッキング数の取得
-                blockingCount = dbAccess.GetBlockingCount(CommonServer02Settings.ConnectionString);
-                BlockingAlert02.CheckBlockingAlert(blockingCount);
+                blockingCount = dbAccess.GetBlockingCount(CommonServer02Settings.ConnectionString, ref currentBlockingSidList02);
+
+                bool isHited = false;                       // ヒットしたかどうか
+
+                for (int i = 0; i < currentBlockingSidList02.Count; i++)
+                {
+                    // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
+                    if (!chkBlockingSidList02.ContainsKey(currentBlockingSidList02[i].ToString()))
+                    {
+                        chkBlockingSidList02.Add(currentBlockingSidList02[i].ToString(), 1);
+                    }
+                    else
+                    {
+                        // 含まれていた場合はカウンタをインクリメント
+                        string keySid = currentBlockingSidList02[i].ToString();
+
+                        int currentValue = (int)chkBlockingSidList02[keySid] + 1;
+
+                        chkBlockingSidList02[keySid] = currentValue;
+
+                    }
+                }
+
+                if (currentBlockingSidList02.Count == 0)
+                {
+                    chkBlockingSidList02.Clear();
+                }
+
+                // ブロッキングリストをコピー
+                bufBlockingSidList02 = (Hashtable)chkBlockingSidList02.Clone();
+
+                // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
+
+
+                foreach (string key in chkBlockingSidList02.Keys)
+                {
+                    // フラグ初期化
+                    isHited = false;
+
+                    for (int i = 0; i < currentBlockingSidList02.Count; i++)
+                    {
+
+                        if (key == currentBlockingSidList02[i].ToString())
+                        {
+                            isHited = true;                                 // フラグを立てる
+                            break;
+                        }
+                    }
+
+                    if (isHited == false)
+                    {
+                        bufBlockingSidList02.Remove(key);
+                    }
+                }
+
+                // ブロキングリスト(退避)から複製
+                chkBlockingSidList02.Clear();
+                chkBlockingSidList02 = (Hashtable)bufBlockingSidList02.Clone();
+
+                int maxBlockingCount = 0;
+
+                // ブロッキング取得回数の最大値を検索
+                foreach (string key in chkBlockingSidList02.Keys)
+                {
+                    if (maxBlockingCount < (int)chkBlockingSidList02[key])
+                    {
+                        maxBlockingCount = (int)chkBlockingSidList02[key];
+                    }
+                }
+
+                BlockingAlert02.CheckBlockingAlert(maxBlockingCount);
 
                 isChecked = true;
             }
@@ -544,8 +699,77 @@ namespace DBKeeper
             if (timeSpan >= CommonServer03Settings.CpuCheckCycle)
             {
                 // ブロッキング数の取得
-                blockingCount = dbAccess.GetBlockingCount(CommonServer03Settings.ConnectionString);
-                BlockingAlert03.CheckBlockingAlert(blockingCount);
+                blockingCount = dbAccess.GetBlockingCount(CommonServer03Settings.ConnectionString, ref currentBlockingSidList03);
+
+                bool isHited = false;                       // ヒットしたかどうか
+
+                for (int i = 0; i < currentBlockingSidList03.Count; i++)
+                {
+                    // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
+                    if (!chkBlockingSidList03.ContainsKey(currentBlockingSidList03[i].ToString()))
+                    {
+                        chkBlockingSidList03.Add(currentBlockingSidList03[i].ToString(), 1);
+                    }
+                    else
+                    {
+                        // 含まれていた場合はカウンタをインクリメント
+                        string keySid = currentBlockingSidList03[i].ToString();
+
+                        int currentValue = (int)chkBlockingSidList03[keySid] + 1;
+
+                        chkBlockingSidList03[keySid] = currentValue;
+
+                    }
+                }
+
+                if (currentBlockingSidList03.Count == 0)
+                {
+                    chkBlockingSidList03.Clear();
+                }
+
+                // ブロッキングリストをコピー
+                bufBlockingSidList03 = (Hashtable)chkBlockingSidList03.Clone();
+
+                // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
+
+
+                foreach (string key in chkBlockingSidList03.Keys)
+                {
+                    // フラグ初期化
+                    isHited = false;
+
+                    for (int i = 0; i < currentBlockingSidList03.Count; i++)
+                    {
+
+                        if (key == currentBlockingSidList03[i].ToString())
+                        {
+                            isHited = true;                                 // フラグを立てる
+                            break;
+                        }
+                    }
+
+                    if (isHited == false)
+                    {
+                        bufBlockingSidList03.Remove(key);
+                    }
+                }
+
+                // ブロキングリスト(退避)から複製
+                chkBlockingSidList03.Clear();
+                chkBlockingSidList03 = (Hashtable)bufBlockingSidList03.Clone();
+
+                int maxBlockingCount = 0;
+
+                // ブロッキング取得回数の最大値を検索
+                foreach (string key in chkBlockingSidList03.Keys)
+                {
+                    if (maxBlockingCount < (int)chkBlockingSidList03[key])
+                    {
+                        maxBlockingCount = (int)chkBlockingSidList03[key];
+                    }
+                }
+
+                BlockingAlert03.CheckBlockingAlert(maxBlockingCount);
 
                 isChecked = true;
             }
@@ -646,8 +870,77 @@ namespace DBKeeper
             if (timeSpan >= CommonServer04Settings.CpuCheckCycle)
             {
                 // ブロッキング数の取得
-                blockingCount = dbAccess.GetBlockingCount(CommonServer04Settings.ConnectionString);
-                BlockingAlert04.CheckBlockingAlert(blockingCount);
+                blockingCount = dbAccess.GetBlockingCount(CommonServer04Settings.ConnectionString, ref currentBlockingSidList04);
+
+                bool isHited = false;                       // ヒットしたかどうか
+
+                for (int i = 0; i < currentBlockingSidList04.Count; i++)
+                {
+                    // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
+                    if (!chkBlockingSidList04.ContainsKey(currentBlockingSidList04[i].ToString()))
+                    {
+                        chkBlockingSidList04.Add(currentBlockingSidList04[i].ToString(), 1);
+                    }
+                    else
+                    {
+                        // 含まれていた場合はカウンタをインクリメント
+                        string keySid = currentBlockingSidList04[i].ToString();
+
+                        int currentValue = (int)chkBlockingSidList04[keySid] + 1;
+
+                        chkBlockingSidList04[keySid] = currentValue;
+
+                    }
+                }
+
+                if (currentBlockingSidList04.Count == 0)
+                {
+                    chkBlockingSidList04.Clear();
+                }
+
+                // ブロッキングリストをコピー
+                bufBlockingSidList04 = (Hashtable)chkBlockingSidList04.Clone();
+
+                // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
+
+
+                foreach (string key in chkBlockingSidList04.Keys)
+                {
+                    // フラグ初期化
+                    isHited = false;
+
+                    for (int i = 0; i < currentBlockingSidList04.Count; i++)
+                    {
+
+                        if (key == currentBlockingSidList04[i].ToString())
+                        {
+                            isHited = true;                                 // フラグを立てる
+                            break;
+                        }
+                    }
+
+                    if (isHited == false)
+                    {
+                        bufBlockingSidList04.Remove(key);
+                    }
+                }
+
+                // ブロキングリスト(退避)から複製
+                chkBlockingSidList04.Clear();
+                chkBlockingSidList04 = (Hashtable)bufBlockingSidList04.Clone();
+
+                int maxBlockingCount = 0;
+
+                // ブロッキング取得回数の最大値を検索
+                foreach (string key in chkBlockingSidList04.Keys)
+                {
+                    if (maxBlockingCount < (int)chkBlockingSidList04[key])
+                    {
+                        maxBlockingCount = (int)chkBlockingSidList04[key];
+                    }
+                }
+
+                BlockingAlert04.CheckBlockingAlert(maxBlockingCount);
 
                 isChecked = true;
             }
