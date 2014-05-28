@@ -426,7 +426,14 @@ namespace DBKeeper.Classes.Common
                     dataTable = dataSet.Tables[0];
                     dataValue = dataTable.Rows[0][0].ToString();
 
-                    retValue = double.Parse(dataValue);
+                    try
+                    {
+                        retValue = double.Parse(dataValue);
+                    }
+                    catch
+                    {
+                        retValue = 0;
+                    }
                 }
 
             }
@@ -442,8 +449,9 @@ namespace DBKeeper.Classes.Common
         /// </summary>
         /// <param name="CurrentConnectionString">対象の接続文字列</param>
         /// <param name="refBlockingSidList">ブロッキングリスト</param>
+        /// <param name="refLoginInfo">ログイン情報</param>
         /// <returns>ブロッキングセッション数</returns>
-        public int GetBlockingCount(string CurrentConnectionString, ref ArrayList refBlockingSidList)
+        public int GetBlockingCount(string CurrentConnectionString, ref ArrayList refBlockingSidList, ref string refLoginInfo)
         {
             int retValue = 0;                // 戻り値用
             string selectSQL = "";              // 取得用SQL
@@ -501,9 +509,13 @@ namespace DBKeeper.Classes.Common
             selectSQL += ";";
              * */
 
-            selectSQL = "select blocking_session_id" + "\n";
-            selectSQL += "  from sys.dm_os_waiting_tasks" + "\n";
-            selectSQL += " where blocking_session_id > 50;";
+            selectSQL = "select a.blocking_session_id" + "\n";
+            selectSQL += "    , isnull(b.login_name,'') + ':' + isnull(b.host_name,'') as [login_info]" + "\n";
+            selectSQL += "  from sys.dm_os_waiting_tasks a" + "\n";
+            selectSQL += "  left join sys.dm_exec_sessions b" + "\n";
+            selectSQL += "    on a.blocking_session_id = b.session_id" + "\n";
+            selectSQL += " where a.blocking_session_id > 50" + "\n";
+            selectSQL += " order by b.total_elapsed_time desc";
 
             dataSet = GetDataSet(selectSQL, CurrentConnectionString, ref errorMessage);
 
@@ -517,6 +529,12 @@ namespace DBKeeper.Classes.Common
                     {
                         // ブロッキングセッションIDをArrayListに蓄積
                         blockingList.Add(dataTable.Rows[i]["blocking_session_id"].ToString());
+
+                        // 最初の1件のみ、ログイン情報を取得する
+                        if (i == 0)
+                        {
+                            refLoginInfo = dataTable.Rows[i]["login_info"].ToString();
+                        }
                     }
 
                     // dataValue = dataTable.Rows[0][0].ToString();

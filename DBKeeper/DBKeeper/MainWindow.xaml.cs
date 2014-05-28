@@ -16,6 +16,7 @@ using DBKeeper.Classes.Common;
 using System.Windows.Threading;
 using System.Threading;
 using System.Collections;
+using System.Windows.Media.Animation;
 
 namespace DBKeeper
 {
@@ -303,132 +304,228 @@ namespace DBKeeper
             memoryText = "";
             // ================================================================
 
-            if (timeSpan >= CommonServer01Settings.CpuCheckCycle)
+            try
             {
-                // CPUの使用率を取得する
-                cpuUseage = dbAccess.GetCpuUseage(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName);
-
-                CpuMeter01.MeterValue = cpuUseage;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer01Settings.BufferCacheCheckCycle)
-            {
-                // バッファキャッシュヒット率を取得する
-                bufferCacheHitRate = dbAccess.GetBufferCacheHitRate(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName);
-
-                BufferCacheHitRate01.MeterValue = bufferCacheHitRate;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer01Settings.ProcedureCacheCheckCycle)
-            {
-                // プロシージャキャッシュヒット率を取得する
-                procedureCacheHitRate = dbAccess.GetProcedureCacheHitRate(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName);
-
-                ProcedureCacheHitRate01.MeterValue = procedureCacheHitRate;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer01Settings.MemoryCheckCycle)
-            {
-                // メモリ使用率を取得
-                memoryUseage = dbAccess.GetMemoryUseage(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName, ref memoryText);
-
-                MemoryMeter01.MeterValue = memoryUseage;
-                MemoryMeter01.MeterValueText = memoryText;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer01Settings.HddIoCheckCycle)
-            {
-                // ディスクI/Oビジー率の取得
-                diskIoBusy = dbAccess.GetDiskIOBusy(CommonServer01Settings.ConnectionString);
-                Disk_I_O_Meter01.MeterValue = (int)diskIoBusy;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer01Settings.BlockingCheckCycle)
-            {
-                // ブロッキング数の取得
-                blockingCount = dbAccess.GetBlockingCount(CommonServer01Settings.ConnectionString, ref currentBlockingSidList01);
-
-                bool isHited = false;                       // ヒットしたかどうか
-
-                for (int i = 0; i < currentBlockingSidList01.Count; i++)
+                if (timeSpan >= CommonServer01Settings.CpuCheckCycle)
                 {
-                    // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
-                    if (!chkBlockingSidList01.ContainsKey(currentBlockingSidList01[i].ToString()))
-                    {
-                        chkBlockingSidList01.Add(currentBlockingSidList01[i].ToString(), 1);
-                    }
-                    else
-                    {
-                        // 含まれていた場合はカウンタをインクリメント
-                        string keySid = currentBlockingSidList01[i].ToString();
+                    // CPUの使用率を取得する
+                    cpuUseage = dbAccess.GetCpuUseage(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName);
 
-                        int currentValue = (int)chkBlockingSidList01[keySid] + 1;
+                    CpuMeter01.MeterValue = cpuUseage;
 
-                        chkBlockingSidList01[keySid] = currentValue;
-
-                    }
+                    isChecked = true;
                 }
+            }
+            catch(Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server01" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　CPU使用率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                if (currentBlockingSidList01.Count == 0)
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer01Settings.BufferCacheCheckCycle)
                 {
-                    chkBlockingSidList01.Clear();
+                    // バッファキャッシュヒット率を取得する
+                    bufferCacheHitRate = dbAccess.GetBufferCacheHitRate(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName);
+
+                    BufferCacheHitRate01.MeterValue = bufferCacheHitRate;
+
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server01" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　バッファキャッシュヒット率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                // ブロッキングリストをコピー
-                bufBlockingSidList01 = (Hashtable)chkBlockingSidList01.Clone();
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
-                // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
-                
-
-                foreach (string key in chkBlockingSidList01.Keys)
+            try
+            {
+                if (timeSpan >= CommonServer01Settings.ProcedureCacheCheckCycle)
                 {
-                    // フラグ初期化
-                    isHited = false;
+                    // プロシージャキャッシュヒット率を取得する
+                    procedureCacheHitRate = dbAccess.GetProcedureCacheHitRate(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName);
+
+                    ProcedureCacheHitRate01.MeterValue = procedureCacheHitRate;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server01" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　プロシージャキャッシュヒット率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer01Settings.MemoryCheckCycle)
+                {
+                    // メモリ使用率を取得
+                    memoryUseage = dbAccess.GetMemoryUseage(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName, ref memoryText);
+
+                    MemoryMeter01.MeterValue = memoryUseage;
+                    MemoryMeter01.MeterValueText = memoryText;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server01" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　メモリ使用率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer01Settings.HddIoCheckCycle)
+                {
+                    // ディスクI/Oビジー率の取得
+                    diskIoBusy = dbAccess.GetDiskIOBusy(CommonServer01Settings.ConnectionString);
+                    Disk_I_O_Meter01.MeterValue = (int)diskIoBusy;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server01" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　ディスクI/Oビジー率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer01Settings.BlockingCheckCycle)
+                {
+                    string loginInfo = "";                   // ログイン情報
+
+                    // ブロッキング数の取得
+                    blockingCount = dbAccess.GetBlockingCount(CommonServer01Settings.ConnectionString, ref currentBlockingSidList01, ref loginInfo);
+
+                    bool isHited = false;                       // ヒットしたかどうか
 
                     for (int i = 0; i < currentBlockingSidList01.Count; i++)
                     {
-                            
-                        if (key == currentBlockingSidList01[i].ToString())
+                        // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
+                        if (!chkBlockingSidList01.ContainsKey(currentBlockingSidList01[i].ToString()))
                         {
-                            isHited = true;                                 // フラグを立てる
-                            break;
+                            chkBlockingSidList01.Add(currentBlockingSidList01[i].ToString(), 1);
+                        }
+                        else
+                        {
+                            // 含まれていた場合はカウンタをインクリメント
+                            string keySid = currentBlockingSidList01[i].ToString();
+
+                            int currentValue = (int)chkBlockingSidList01[keySid] + 1;
+
+                            chkBlockingSidList01[keySid] = currentValue;
+
                         }
                     }
 
-                    if (isHited == false)
+                    if (currentBlockingSidList01.Count == 0)
                     {
-                        bufBlockingSidList01.Remove(key);
+                        chkBlockingSidList01.Clear();
                     }
-                }
 
-                // ブロキングリスト(退避)から複製
-                chkBlockingSidList01.Clear();
-                chkBlockingSidList01 = (Hashtable)bufBlockingSidList01.Clone();
+                    // ブロッキングリストをコピー
+                    bufBlockingSidList01 = (Hashtable)chkBlockingSidList01.Clone();
 
-                int maxBlockingCount = 0;
+                    // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
 
-                // ブロッキング取得回数の最大値を検索
-                foreach (string key in chkBlockingSidList01.Keys)
-                {
-                    if (maxBlockingCount < (int)chkBlockingSidList01[key])
+
+                    foreach (string key in chkBlockingSidList01.Keys)
                     {
-                        maxBlockingCount = (int)chkBlockingSidList01[key];
+                        // フラグ初期化
+                        isHited = false;
+
+                        for (int i = 0; i < currentBlockingSidList01.Count; i++)
+                        {
+
+                            if (key == currentBlockingSidList01[i].ToString())
+                            {
+                                isHited = true;                                 // フラグを立てる
+                                break;
+                            }
+                        }
+
+                        if (isHited == false)
+                        {
+                            bufBlockingSidList01.Remove(key);
+                        }
                     }
+
+                    // ブロキングリスト(退避)から複製
+                    chkBlockingSidList01.Clear();
+                    chkBlockingSidList01 = (Hashtable)bufBlockingSidList01.Clone();
+
+                    int maxBlockingCount = 0;
+
+                    // ブロッキング取得回数の最大値を検索
+                    foreach (string key in chkBlockingSidList01.Keys)
+                    {
+                        if (maxBlockingCount < (int)chkBlockingSidList01[key])
+                        {
+                            maxBlockingCount = (int)chkBlockingSidList01[key];
+                        }
+                    }
+
+                    // ブロッキング検出回数により警告色へ移行
+                    BlockingAlert01.CheckBlockingAlert(maxBlockingCount);
+
+                    // ログイン情報を表示
+                    BlockingInfo01.Text = loginInfo;
+
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server01" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　ブロッキング数チェック" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                BlockingAlert01.CheckBlockingAlert(maxBlockingCount);
-
-                isChecked = true;
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             if (isChecked == true)
@@ -475,132 +572,226 @@ namespace DBKeeper
             memoryText = "";
             // ================================================================
 
-            if (timeSpan >= CommonServer02Settings.CpuCheckCycle)
+            try
             {
-                // CPUの使用率を取得する
-                cpuUseage = dbAccess.GetCpuUseage(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName);
-
-                CpuMeter02.MeterValue = cpuUseage;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer02Settings.BufferCacheCheckCycle)
-            {
-                // バッファキャッシュヒット率を取得する
-                bufferCacheHitRate = dbAccess.GetBufferCacheHitRate(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName);
-
-                BufferCacheHitRate02.MeterValue = bufferCacheHitRate;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer02Settings.ProcedureCacheCheckCycle)
-            {
-                // プロシージャキャッシュヒット率を取得する
-                procedureCacheHitRate = dbAccess.GetProcedureCacheHitRate(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName);
-
-                ProcedureCacheHitRate02.MeterValue = procedureCacheHitRate;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer02Settings.MemoryCheckCycle)
-            {
-                // メモリ使用率を取得
-                memoryUseage = dbAccess.GetMemoryUseage(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName, ref memoryText);
-
-                MemoryMeter02.MeterValue = memoryUseage;
-                MemoryMeter02.MeterValueText = memoryText;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer02Settings.HddIoCheckCycle)
-            {
-                // ディスクI/Oビジー率の取得
-                diskIoBusy = dbAccess.GetDiskIOBusy(CommonServer02Settings.ConnectionString);
-                Disk_I_O_Meter02.MeterValue = (int)diskIoBusy;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer02Settings.CpuCheckCycle)
-            {
-                // ブロッキング数の取得
-                blockingCount = dbAccess.GetBlockingCount(CommonServer02Settings.ConnectionString, ref currentBlockingSidList02);
-
-                bool isHited = false;                       // ヒットしたかどうか
-
-                for (int i = 0; i < currentBlockingSidList02.Count; i++)
+                if (timeSpan >= CommonServer02Settings.CpuCheckCycle)
                 {
-                    // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
-                    if (!chkBlockingSidList02.ContainsKey(currentBlockingSidList02[i].ToString()))
-                    {
-                        chkBlockingSidList02.Add(currentBlockingSidList02[i].ToString(), 1);
-                    }
-                    else
-                    {
-                        // 含まれていた場合はカウンタをインクリメント
-                        string keySid = currentBlockingSidList02[i].ToString();
+                    // CPUの使用率を取得する
+                    cpuUseage = dbAccess.GetCpuUseage(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName);
 
-                        int currentValue = (int)chkBlockingSidList02[keySid] + 1;
+                    CpuMeter02.MeterValue = cpuUseage;
 
-                        chkBlockingSidList02[keySid] = currentValue;
-
-                    }
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server02" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　CPU使用率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                if (currentBlockingSidList02.Count == 0)
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer02Settings.BufferCacheCheckCycle)
                 {
-                    chkBlockingSidList02.Clear();
+                    // バッファキャッシュヒット率を取得する
+                    bufferCacheHitRate = dbAccess.GetBufferCacheHitRate(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName);
+
+                    BufferCacheHitRate02.MeterValue = bufferCacheHitRate;
+
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server02" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　バッファキャッシュヒット率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                // ブロッキングリストをコピー
-                bufBlockingSidList02 = (Hashtable)chkBlockingSidList02.Clone();
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
-                // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
-
-
-                foreach (string key in chkBlockingSidList02.Keys)
+            try
+            {
+                if (timeSpan >= CommonServer02Settings.ProcedureCacheCheckCycle)
                 {
-                    // フラグ初期化
-                    isHited = false;
+                    // プロシージャキャッシュヒット率を取得する
+                    procedureCacheHitRate = dbAccess.GetProcedureCacheHitRate(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName);
+
+                    ProcedureCacheHitRate02.MeterValue = procedureCacheHitRate;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server02" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　プロシージャキャッシュヒット率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer02Settings.MemoryCheckCycle)
+                {
+                    // メモリ使用率を取得
+                    memoryUseage = dbAccess.GetMemoryUseage(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName, ref memoryText);
+
+                    MemoryMeter02.MeterValue = memoryUseage;
+                    MemoryMeter02.MeterValueText = memoryText;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server02" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　メモリ使用率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer02Settings.HddIoCheckCycle)
+                {
+                    // ディスクI/Oビジー率の取得
+                    diskIoBusy = dbAccess.GetDiskIOBusy(CommonServer02Settings.ConnectionString);
+                    Disk_I_O_Meter02.MeterValue = (int)diskIoBusy;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server02" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　ディスクI/Oビジー率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer02Settings.BlockingCheckCycle)
+                {
+                    string loginInfo = "";                      // ログイン情報
+
+                    // ブロッキング数の取得
+                    blockingCount = dbAccess.GetBlockingCount(CommonServer02Settings.ConnectionString, ref currentBlockingSidList02, ref loginInfo);
+
+                    bool isHited = false;                       // ヒットしたかどうか
 
                     for (int i = 0; i < currentBlockingSidList02.Count; i++)
                     {
-
-                        if (key == currentBlockingSidList02[i].ToString())
+                        // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
+                        if (!chkBlockingSidList02.ContainsKey(currentBlockingSidList02[i].ToString()))
                         {
-                            isHited = true;                                 // フラグを立てる
-                            break;
+                            chkBlockingSidList02.Add(currentBlockingSidList02[i].ToString(), 1);
+                        }
+                        else
+                        {
+                            // 含まれていた場合はカウンタをインクリメント
+                            string keySid = currentBlockingSidList02[i].ToString();
+
+                            int currentValue = (int)chkBlockingSidList02[keySid] + 1;
+
+                            chkBlockingSidList02[keySid] = currentValue;
+
                         }
                     }
 
-                    if (isHited == false)
+                    if (currentBlockingSidList02.Count == 0)
                     {
-                        bufBlockingSidList02.Remove(key);
+                        chkBlockingSidList02.Clear();
                     }
-                }
 
-                // ブロキングリスト(退避)から複製
-                chkBlockingSidList02.Clear();
-                chkBlockingSidList02 = (Hashtable)bufBlockingSidList02.Clone();
+                    // ブロッキングリストをコピー
+                    bufBlockingSidList02 = (Hashtable)chkBlockingSidList02.Clone();
 
-                int maxBlockingCount = 0;
-
-                // ブロッキング取得回数の最大値を検索
-                foreach (string key in chkBlockingSidList02.Keys)
-                {
-                    if (maxBlockingCount < (int)chkBlockingSidList02[key])
+                    // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
+                    foreach (string key in chkBlockingSidList02.Keys)
                     {
-                        maxBlockingCount = (int)chkBlockingSidList02[key];
+                        // フラグ初期化
+                        isHited = false;
+
+                        for (int i = 0; i < currentBlockingSidList02.Count; i++)
+                        {
+
+                            if (key == currentBlockingSidList02[i].ToString())
+                            {
+                                isHited = true;                                 // フラグを立てる
+                                break;
+                            }
+                        }
+
+                        if (isHited == false)
+                        {
+                            bufBlockingSidList02.Remove(key);
+                        }
                     }
+
+                    // ブロキングリスト(退避)から複製
+                    chkBlockingSidList02.Clear();
+                    chkBlockingSidList02 = (Hashtable)bufBlockingSidList02.Clone();
+
+                    int maxBlockingCount = 0;
+
+                    // ブロッキング取得回数の最大値を検索
+                    foreach (string key in chkBlockingSidList02.Keys)
+                    {
+                        if (maxBlockingCount < (int)chkBlockingSidList02[key])
+                        {
+                            maxBlockingCount = (int)chkBlockingSidList02[key];
+                        }
+                    }
+
+                    // ブロッキング検出回数により警告色へ移行
+                    BlockingAlert02.CheckBlockingAlert(maxBlockingCount);
+
+                    // ログイン情報の表示
+                    BlockingInfo02.Text = loginInfo;
+
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server02" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　ブロッキング取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                BlockingAlert02.CheckBlockingAlert(maxBlockingCount);
-
-                isChecked = true;
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             if (isChecked == true)
@@ -646,132 +837,226 @@ namespace DBKeeper
             memoryText = "";
             // ================================================================
 
-            if (timeSpan >= CommonServer03Settings.CpuCheckCycle)
+            try
             {
-                // CPUの使用率を取得する
-                cpuUseage = dbAccess.GetCpuUseage(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName);
-
-                CpuMeter03.MeterValue = cpuUseage;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer03Settings.BufferCacheCheckCycle)
-            {
-                // バッファキャッシュヒット率を取得する
-                bufferCacheHitRate = dbAccess.GetBufferCacheHitRate(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName);
-
-                BufferCacheHitRate03.MeterValue = bufferCacheHitRate;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer03Settings.ProcedureCacheCheckCycle)
-            {
-                // プロシージャキャッシュヒット率を取得する
-                procedureCacheHitRate = dbAccess.GetProcedureCacheHitRate(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName);
-
-                ProcedureCacheHitRate03.MeterValue = procedureCacheHitRate;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer03Settings.MemoryCheckCycle)
-            {
-                // メモリ使用率を取得
-                memoryUseage = dbAccess.GetMemoryUseage(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName, ref memoryText);
-
-                MemoryMeter03.MeterValue = memoryUseage;
-                MemoryMeter03.MeterValueText = memoryText;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer03Settings.HddIoCheckCycle)
-            {
-                // ディスクI/Oビジー率の取得
-                diskIoBusy = dbAccess.GetDiskIOBusy(CommonServer03Settings.ConnectionString);
-                Disk_I_O_Meter03.MeterValue = (int)diskIoBusy;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer03Settings.CpuCheckCycle)
-            {
-                // ブロッキング数の取得
-                blockingCount = dbAccess.GetBlockingCount(CommonServer03Settings.ConnectionString, ref currentBlockingSidList03);
-
-                bool isHited = false;                       // ヒットしたかどうか
-
-                for (int i = 0; i < currentBlockingSidList03.Count; i++)
+                if (timeSpan >= CommonServer03Settings.CpuCheckCycle)
                 {
-                    // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
-                    if (!chkBlockingSidList03.ContainsKey(currentBlockingSidList03[i].ToString()))
-                    {
-                        chkBlockingSidList03.Add(currentBlockingSidList03[i].ToString(), 1);
-                    }
-                    else
-                    {
-                        // 含まれていた場合はカウンタをインクリメント
-                        string keySid = currentBlockingSidList03[i].ToString();
+                    // CPUの使用率を取得する
+                    cpuUseage = dbAccess.GetCpuUseage(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName);
 
-                        int currentValue = (int)chkBlockingSidList03[keySid] + 1;
+                    CpuMeter03.MeterValue = cpuUseage;
 
-                        chkBlockingSidList03[keySid] = currentValue;
-
-                    }
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server03" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　CPU使用率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                if (currentBlockingSidList03.Count == 0)
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer03Settings.BufferCacheCheckCycle)
                 {
-                    chkBlockingSidList03.Clear();
+                    // バッファキャッシュヒット率を取得する
+                    bufferCacheHitRate = dbAccess.GetBufferCacheHitRate(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName);
+
+                    BufferCacheHitRate03.MeterValue = bufferCacheHitRate;
+
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server03" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　バッファキャッシュヒット率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                // ブロッキングリストをコピー
-                bufBlockingSidList03 = (Hashtable)chkBlockingSidList03.Clone();
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
-                // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
-
-
-                foreach (string key in chkBlockingSidList03.Keys)
+            try
+            {
+                if (timeSpan >= CommonServer03Settings.ProcedureCacheCheckCycle)
                 {
-                    // フラグ初期化
-                    isHited = false;
+                    // プロシージャキャッシュヒット率を取得する
+                    procedureCacheHitRate = dbAccess.GetProcedureCacheHitRate(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName);
+
+                    ProcedureCacheHitRate03.MeterValue = procedureCacheHitRate;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server03" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　プロシージャキャッシュヒット率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer03Settings.MemoryCheckCycle)
+                {
+                    // メモリ使用率を取得
+                    memoryUseage = dbAccess.GetMemoryUseage(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName, ref memoryText);
+
+                    MemoryMeter03.MeterValue = memoryUseage;
+                    MemoryMeter03.MeterValueText = memoryText;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server03" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　メモリ使用率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer03Settings.HddIoCheckCycle)
+                {
+                    // ディスクI/Oビジー率の取得
+                    diskIoBusy = dbAccess.GetDiskIOBusy(CommonServer03Settings.ConnectionString);
+                    Disk_I_O_Meter03.MeterValue = (int)diskIoBusy;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server03" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　ディスクI/Oビジー率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer03Settings.BlockingCheckCycle)
+                {
+                    string loginInfo = "";                      // ログイン情報
+
+                    // ブロッキング数の取得
+                    blockingCount = dbAccess.GetBlockingCount(CommonServer03Settings.ConnectionString, ref currentBlockingSidList03, ref loginInfo);
+
+                    bool isHited = false;                       // ヒットしたかどうか
 
                     for (int i = 0; i < currentBlockingSidList03.Count; i++)
                     {
-
-                        if (key == currentBlockingSidList03[i].ToString())
+                        // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
+                        if (!chkBlockingSidList03.ContainsKey(currentBlockingSidList03[i].ToString()))
                         {
-                            isHited = true;                                 // フラグを立てる
-                            break;
+                            chkBlockingSidList03.Add(currentBlockingSidList03[i].ToString(), 1);
+                        }
+                        else
+                        {
+                            // 含まれていた場合はカウンタをインクリメント
+                            string keySid = currentBlockingSidList03[i].ToString();
+
+                            int currentValue = (int)chkBlockingSidList03[keySid] + 1;
+
+                            chkBlockingSidList03[keySid] = currentValue;
+
                         }
                     }
 
-                    if (isHited == false)
+                    if (currentBlockingSidList03.Count == 0)
                     {
-                        bufBlockingSidList03.Remove(key);
+                        chkBlockingSidList03.Clear();
                     }
-                }
 
-                // ブロキングリスト(退避)から複製
-                chkBlockingSidList03.Clear();
-                chkBlockingSidList03 = (Hashtable)bufBlockingSidList03.Clone();
+                    // ブロッキングリストをコピー
+                    bufBlockingSidList03 = (Hashtable)chkBlockingSidList03.Clone();
 
-                int maxBlockingCount = 0;
-
-                // ブロッキング取得回数の最大値を検索
-                foreach (string key in chkBlockingSidList03.Keys)
-                {
-                    if (maxBlockingCount < (int)chkBlockingSidList03[key])
+                    // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
+                    foreach (string key in chkBlockingSidList03.Keys)
                     {
-                        maxBlockingCount = (int)chkBlockingSidList03[key];
+                        // フラグ初期化
+                        isHited = false;
+
+                        for (int i = 0; i < currentBlockingSidList03.Count; i++)
+                        {
+
+                            if (key == currentBlockingSidList03[i].ToString())
+                            {
+                                isHited = true;                                 // フラグを立てる
+                                break;
+                            }
+                        }
+
+                        if (isHited == false)
+                        {
+                            bufBlockingSidList03.Remove(key);
+                        }
                     }
+
+                    // ブロキングリスト(退避)から複製
+                    chkBlockingSidList03.Clear();
+                    chkBlockingSidList03 = (Hashtable)bufBlockingSidList03.Clone();
+
+                    int maxBlockingCount = 0;
+
+                    // ブロッキング取得回数の最大値を検索
+                    foreach (string key in chkBlockingSidList03.Keys)
+                    {
+                        if (maxBlockingCount < (int)chkBlockingSidList03[key])
+                        {
+                            maxBlockingCount = (int)chkBlockingSidList03[key];
+                        }
+                    }
+
+                    // ブロッキング検出回数により警告色へ移行
+                    BlockingAlert03.CheckBlockingAlert(maxBlockingCount);
+
+                    // ログイン情報の表示
+                    BlockingInfo03.Text = loginInfo;
+
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server03" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　ブロッキング数取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                BlockingAlert03.CheckBlockingAlert(maxBlockingCount);
-
-                isChecked = true;
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             if (isChecked == true)
@@ -817,132 +1102,227 @@ namespace DBKeeper
             memoryText = "";
             // ================================================================
 
-            if (timeSpan >= CommonServer04Settings.CpuCheckCycle)
+            try
             {
-                // CPUの使用率を取得する
-                cpuUseage = dbAccess.GetCpuUseage(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName);
-
-                CpuMeter04.MeterValue = cpuUseage;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer04Settings.BufferCacheCheckCycle)
-            {
-                // バッファキャッシュヒット率を取得する
-                bufferCacheHitRate = dbAccess.GetBufferCacheHitRate(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName);
-
-                BufferCacheHitRate04.MeterValue = bufferCacheHitRate;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer04Settings.ProcedureCacheCheckCycle)
-            {
-                // プロシージャキャッシュヒット率を取得する
-                procedureCacheHitRate = dbAccess.GetProcedureCacheHitRate(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName);
-
-                ProcedureCacheHitRate04.MeterValue = procedureCacheHitRate;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer04Settings.MemoryCheckCycle)
-            {
-                // メモリ使用率を取得
-                memoryUseage = dbAccess.GetMemoryUseage(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName, ref memoryText);
-
-                MemoryMeter04.MeterValue = memoryUseage;
-                MemoryMeter04.MeterValueText = memoryText;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer04Settings.HddIoCheckCycle)
-            {
-                // ディスクI/Oビジー率の取得
-                diskIoBusy = dbAccess.GetDiskIOBusy(CommonServer04Settings.ConnectionString);
-                Disk_I_O_Meter04.MeterValue = (int)diskIoBusy;
-
-                isChecked = true;
-            }
-
-            if (timeSpan >= CommonServer04Settings.CpuCheckCycle)
-            {
-                // ブロッキング数の取得
-                blockingCount = dbAccess.GetBlockingCount(CommonServer04Settings.ConnectionString, ref currentBlockingSidList04);
-
-                bool isHited = false;                       // ヒットしたかどうか
-
-                for (int i = 0; i < currentBlockingSidList04.Count; i++)
+                if (timeSpan >= CommonServer04Settings.CpuCheckCycle)
                 {
-                    // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
-                    if (!chkBlockingSidList04.ContainsKey(currentBlockingSidList04[i].ToString()))
-                    {
-                        chkBlockingSidList04.Add(currentBlockingSidList04[i].ToString(), 1);
-                    }
-                    else
-                    {
-                        // 含まれていた場合はカウンタをインクリメント
-                        string keySid = currentBlockingSidList04[i].ToString();
+                    // CPUの使用率を取得する
+                    cpuUseage = dbAccess.GetCpuUseage(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName);
 
-                        int currentValue = (int)chkBlockingSidList04[keySid] + 1;
+                    CpuMeter04.MeterValue = cpuUseage;
 
-                        chkBlockingSidList04[keySid] = currentValue;
-
-                    }
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server04" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　CPU使用率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                if (currentBlockingSidList04.Count == 0)
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer04Settings.BufferCacheCheckCycle)
                 {
-                    chkBlockingSidList04.Clear();
+                    // バッファキャッシュヒット率を取得する
+                    bufferCacheHitRate = dbAccess.GetBufferCacheHitRate(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName);
+
+                    BufferCacheHitRate04.MeterValue = bufferCacheHitRate;
+
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server04" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　バッファキャッシュヒット率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                // ブロッキングリストをコピー
-                bufBlockingSidList04 = (Hashtable)chkBlockingSidList04.Clone();
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
-                // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
-
-
-                foreach (string key in chkBlockingSidList04.Keys)
+            try
+            {
+                if (timeSpan >= CommonServer04Settings.ProcedureCacheCheckCycle)
                 {
-                    // フラグ初期化
-                    isHited = false;
+                    // プロシージャキャッシュヒット率を取得する
+                    procedureCacheHitRate = dbAccess.GetProcedureCacheHitRate(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName);
+
+                    ProcedureCacheHitRate04.MeterValue = procedureCacheHitRate;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server04" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　プロシージャキャッシュヒット率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer04Settings.MemoryCheckCycle)
+                {
+                    // メモリ使用率を取得
+                    memoryUseage = dbAccess.GetMemoryUseage(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName, ref memoryText);
+
+                    MemoryMeter04.MeterValue = memoryUseage;
+                    MemoryMeter04.MeterValueText = memoryText;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server04" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　メモリ使用率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer04Settings.HddIoCheckCycle)
+                {
+                    // ディスクI/Oビジー率の取得
+                    diskIoBusy = dbAccess.GetDiskIOBusy(CommonServer04Settings.ConnectionString);
+                    Disk_I_O_Meter04.MeterValue = (int)diskIoBusy;
+
+                    isChecked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server04" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　ディスクI/Oビジー率取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
+
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (timeSpan >= CommonServer04Settings.CpuCheckCycle)
+                {
+                    string loginInfo = "";                  // ログイン情報
+                    // ブロッキング数の取得
+                    blockingCount = dbAccess.GetBlockingCount(CommonServer04Settings.ConnectionString, ref currentBlockingSidList04, ref loginInfo);
+
+                    bool isHited = false;                       // ヒットしたかどうか
 
                     for (int i = 0; i < currentBlockingSidList04.Count; i++)
                     {
-
-                        if (key == currentBlockingSidList04[i].ToString())
+                        // HashTableのキー(SID)が含まれていなかったらHashTableを初期化
+                        if (!chkBlockingSidList04.ContainsKey(currentBlockingSidList04[i].ToString()))
                         {
-                            isHited = true;                                 // フラグを立てる
-                            break;
+                            chkBlockingSidList04.Add(currentBlockingSidList04[i].ToString(), 1);
+                        }
+                        else
+                        {
+                            // 含まれていた場合はカウンタをインクリメント
+                            string keySid = currentBlockingSidList04[i].ToString();
+
+                            int currentValue = (int)chkBlockingSidList04[keySid] + 1;
+
+                            chkBlockingSidList04[keySid] = currentValue;
+
                         }
                     }
 
-                    if (isHited == false)
+                    if (currentBlockingSidList04.Count == 0)
                     {
-                        bufBlockingSidList04.Remove(key);
+                        chkBlockingSidList04.Clear();
                     }
-                }
 
-                // ブロキングリスト(退避)から複製
-                chkBlockingSidList04.Clear();
-                chkBlockingSidList04 = (Hashtable)bufBlockingSidList04.Clone();
+                    // ブロッキングリストをコピー
+                    bufBlockingSidList04 = (Hashtable)chkBlockingSidList04.Clone();
 
-                int maxBlockingCount = 0;
+                    // 今回取得分と前回取得分のSIDを取得し、前回取得分の中に存在しない場合は、該当のSIDを削除
 
-                // ブロッキング取得回数の最大値を検索
-                foreach (string key in chkBlockingSidList04.Keys)
-                {
-                    if (maxBlockingCount < (int)chkBlockingSidList04[key])
+
+                    foreach (string key in chkBlockingSidList04.Keys)
                     {
-                        maxBlockingCount = (int)chkBlockingSidList04[key];
+                        // フラグ初期化
+                        isHited = false;
+
+                        for (int i = 0; i < currentBlockingSidList04.Count; i++)
+                        {
+
+                            if (key == currentBlockingSidList04[i].ToString())
+                            {
+                                isHited = true;                                 // フラグを立てる
+                                break;
+                            }
+                        }
+
+                        if (isHited == false)
+                        {
+                            bufBlockingSidList04.Remove(key);
+                        }
                     }
+
+                    // ブロキングリスト(退避)から複製
+                    chkBlockingSidList04.Clear();
+                    chkBlockingSidList04 = (Hashtable)bufBlockingSidList04.Clone();
+
+                    int maxBlockingCount = 0;
+
+                    // ブロッキング取得回数の最大値を検索
+                    foreach (string key in chkBlockingSidList04.Keys)
+                    {
+                        if (maxBlockingCount < (int)chkBlockingSidList04[key])
+                        {
+                            maxBlockingCount = (int)chkBlockingSidList04[key];
+                        }
+                    }
+
+                    // ブロッキング検出回数により警告色へ移行
+                    BlockingAlert04.CheckBlockingAlert(maxBlockingCount);
+
+                    // ログイン情報の表示
+                    BlockingInfo04.Text = loginInfo;
+
+                    isChecked = true;
                 }
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = "エラーが発生しました。" + "\n";
+                errorMsg += "監視対象：" + "\n";
+                errorMsg += "　Server04" + "\n";
+                errorMsg += "エラー発生個所:" + "\n";
+                errorMsg += "　ブロッキング数取得" + "\n";
+                errorMsg += "エラー詳細:" + "\n";
+                errorMsg += "　" + ex.Message;
 
-                BlockingAlert04.CheckBlockingAlert(maxBlockingCount);
-
-                isChecked = true;
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             if (isChecked == true)
@@ -1009,5 +1389,82 @@ namespace DBKeeper
 
             blockingList.Show();
         }
+
+        /// <summary>
+        /// クエリーモニター画面呼び出しボタンクリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowQueryMonitor1Button_Click(object sender, RoutedEventArgs e)
+        {
+            OpenQueryMonitor(CommonServer01Settings.MonitoringStatus, "01");
+        }
+
+        /// <summary>
+        /// クエリーモニター画面の呼び出し
+        /// </summary>
+        /// <param name="monitoringStatus"></param>
+        /// <param name="windowNo"></param>
+        private void OpenQueryMonitor(string monitoringStatus, string windowNo)
+        {
+            if (monitoringStatus == "Off")
+            {
+                return;
+            }
+
+            QueryMonitor queryMonitor = new QueryMonitor(windowNo);
+            queryMonitor.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+            queryMonitor.Owner = this;
+
+            queryMonitor.Show();
+        }
+
+        /// <summary>
+        /// クエリーモニター画面呼び出しボタンクリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowQueryMonitor2Button_Click(object sender, RoutedEventArgs e)
+        {
+            OpenQueryMonitor(CommonServer02Settings.MonitoringStatus, "02");
+        }
+
+        /// <summary>
+        /// クエリーモニター画面呼び出しボタンクリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowQueryMonitor3Button_Click(object sender, RoutedEventArgs e)
+        {
+            OpenQueryMonitor(CommonServer03Settings.MonitoringStatus, "03");
+        }
+
+        /// <summary>
+        /// クエリーモニター画面呼び出しボタンクリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowQueryMonitor4Button_Click(object sender, RoutedEventArgs e)
+        {
+            OpenQueryMonitor(CommonServer04Settings.MonitoringStatus, "04");
+        }
+
+        
+        /*
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            DoubleAnimation animation01 = new DoubleAnimation();
+            animation01.From = 80;
+            animation01.To = 0;
+            animation01.Duration = new Duration(TimeSpan.FromMilliseconds(1500));
+            Storyboard.SetTargetProperty(animation01, new PropertyPath("(Canvas.Left)"));
+            Storyboard.SetTarget(animation01, this.BlockingInfo01);
+            var storyBoard = new Storyboard();
+            storyBoard.FillBehavior = FillBehavior.HoldEnd;
+            storyBoard.Children.Add(animation01);
+
+            storyBoard.Begin();
+        }
+         * */
     }
 }

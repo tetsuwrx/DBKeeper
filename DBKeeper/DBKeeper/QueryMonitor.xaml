@@ -1,0 +1,158 @@
+﻿<Window x:Class="DBKeeper.QueryMonitor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SQL Serverデータベース監視ツール ～DBKeeper～ - クエリーモニター" Height="767.164" Width="1200"  WindowStartupLocation="CenterOwner" Icon="Resources/DBkeeper.ico">
+    <Grid>
+        <Label Content="実行中のクエリ" HorizontalAlignment="Left" Height="25" Margin="10,10,0,0" VerticalAlignment="Top" Width="244"/>
+        <DataGrid Name="ExecutingQueryList" AutoGenerateColumns="False" ItemsSource="{Binding}" Height="300" Margin="10,35,24,0" VerticalAlignment="Top" RowHeaderWidth="30" >
+            <!--
+            <DataGrid.ItemContainerStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding isblocked}" Value="True">
+                            <Setter Property="Background" Value="LightPink" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.ItemContainerStyle>
+            -->
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="セッションID"
+                    x:Name="col_session_id"
+                    Binding="{Binding session_id}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機種別"
+                    x:Name="col_wait_type"
+                    Binding="{Binding wait_type}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機時間"
+                    x:Name="col_wait_time"
+                    Binding="{Binding wait_time}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="最新待機種別"
+                    x:Name="col_last_wait_type"
+                    Binding="{Binding last_wait_type}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機リソース"
+                    x:Name="col_wait_resource"
+                    Binding="{Binding wait_resource}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="実行中のSQL"
+                    x:Name="col_query_text"
+                    Binding="{Binding query_text}"
+                    IsReadOnly="True"
+                    Width="800"
+                />
+                
+            </DataGrid.Columns>
+        </DataGrid>
+        <Label Content="読み取りI/Oコストの高いクエリ" HorizontalAlignment="Left" Height="25" Margin="10,340,0,0" VerticalAlignment="Top" Width="244"/>
+        <DataGrid x:Name="LogicalReadHighCostQueryList" AutoGenerateColumns="False" ItemsSource="{Binding}" Height="300" Margin="10,365,24,0" VerticalAlignment="Top" RowHeaderWidth="30" >
+            <!--
+            <DataGrid.ItemContainerStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding isblocked}" Value="True">
+                            <Setter Property="Background" Value="LightPink" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.ItemContainerStyle>
+            -->
+            <DataGrid.Columns>
+                <DataGridTextColumn
+        			CanUserReorder="True"
+        			CanUserSort="True"
+        			Header="SQL"
+        			x:Name="col_query_text2"
+        			Binding="{Binding query_text}"
+        			IsReadOnly="True"
+                    Width="800"
+                />
+                <DataGridTextColumn
+        			CanUserReorder="True"
+        			CanUserSort="True"
+        			Header="実行回数"
+        			x:Name="col_execution_count"
+        			Binding="{Binding execution_count}"
+        			IsReadOnly="True"
+                />
+                <DataGridTextColumn
+        			CanUserReorder="True"
+        			CanUserSort="True"
+        			Header="合計論理読込数"
+        			x:Name="col_total_logical_reads"
+        			Binding="{Binding total_logical_reads}"
+        			IsReadOnly="True"
+                />
+                <DataGridTextColumn
+        			CanUserReorder="True"
+        			CanUserSort="True"
+        			Header="最新論理読込数"
+        			x:Name="col_last_logical_reads"
+        			Binding="{Binding last_logical_reads}"
+        			IsReadOnly="True"
+                />
+                <DataGridTextColumn
+        			CanUserReorder="True"
+        			CanUserSort="True"
+        			Header="合計経過時間"
+        			x:Name="col_total_elapsed_time"
+        			Binding="{Binding total_elapsed_time}"
+        			IsReadOnly="True"
+                />
+                <DataGridTextColumn
+        			CanUserReorder="True"
+        			CanUserSort="True"
+        			Header="最新経過時間"
+        			x:Name="col_last_elapsed_time"
+        			Binding="{Binding last_elapsed_time}"
+        			IsReadOnly="True"
+                />
+                <DataGridTextColumn
+        			CanUserReorder="True"
+        			CanUserSort="True"
+        			Header="最終実行時刻"
+        			x:Name="col_last_execution_time"
+        			Binding="{Binding last_execution_time}"
+        			IsReadOnly="True"
+                />
+                <DataGridTextColumn
+        			CanUserReorder="True"
+        			CanUserSort="True"
+        			Header="実行計画"
+        			x:Name="col_query_plan"
+        			Binding="{Binding query_plan}"
+        			IsReadOnly="True"
+                    Width="800"
+                />
+
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Left" Height="35" Margin="1048,682,0,0" VerticalAlignment="Top" Width="120" Click="CloseButton_Click"/>
+        <Button x:Name="RefreshButton" Content="更新" HorizontalAlignment="Left" Height="35" Margin="10,682,0,0" VerticalAlignment="Top" Width="120" Click="RefreshButton_Click"/>
+    </Grid>
+</Window>
