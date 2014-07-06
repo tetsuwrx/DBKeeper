@@ -98,8 +98,8 @@ namespace DBKeeper
         {
             DateTime nowTime = DateTime.Now;
 
-            CpuMeter01.MeterTitle = "CPU Useage";
-            MemoryMeter01.MeterTitle = "Memory Useage";
+            CpuMeter01.MeterTitle = "CPU";
+            MemoryMeter01.MeterTitle = "Memory";
             BufferCacheHitRate01.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate01.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter01.BarTitle = "Disk I/O";
@@ -113,8 +113,8 @@ namespace DBKeeper
                 Server1Title.Content = "N/A";
             }
 
-            CpuMeter02.MeterTitle = "CPU Useage";
-            MemoryMeter02.MeterTitle = "Memory Useage";
+            CpuMeter02.MeterTitle = "CPU";
+            MemoryMeter02.MeterTitle = "Memory";
             BufferCacheHitRate02.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate02.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter02.BarTitle = "Disk I/O";
@@ -128,8 +128,8 @@ namespace DBKeeper
                 Server2Title.Content = "N/A";
             }
 
-            CpuMeter03.MeterTitle = "CPU Useage";
-            MemoryMeter03.MeterTitle = "Memory Useage";
+            CpuMeter03.MeterTitle = "CPU";
+            MemoryMeter03.MeterTitle = "Memory";
             BufferCacheHitRate03.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate03.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter03.BarTitle = "Disk I/O";
@@ -143,8 +143,8 @@ namespace DBKeeper
                 Server3Title.Content = "N/A";
             }
 
-            CpuMeter04.MeterTitle = "CPU Useage";
-            MemoryMeter04.MeterTitle = "Memory Useage";
+            CpuMeter04.MeterTitle = "CPU";
+            MemoryMeter04.MeterTitle = "Memory";
             BufferCacheHitRate04.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate04.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter04.BarTitle = "Disk I/O";

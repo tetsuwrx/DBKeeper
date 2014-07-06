@@ -83,6 +83,9 @@
     <Compile Include="SessionDetail.xaml.cs">
       <DependentUpon>SessionDetail.xaml</DependentUpon>
     </Compile>
+    <Compile Include="QueryText.xaml.cs">
+      <DependentUpon>QueryText.xaml</DependentUpon>
+    </Compile>
     <Page Include="BlockingList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -112,6 +115,10 @@
     <Page Include="SessionDetail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="QueryText.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +161,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\DBkeeper.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Alert.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

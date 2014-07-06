@@ -101,6 +101,7 @@ namespace DBKeeper
             m_table_session_list.Columns.Add(new DataColumn("top_block", typeof(string)));              // 先頭ブロック
             m_table_session_list.Columns.Add(new DataColumn("memory_usage", typeof(int)));              // メモリ使用量(KB)
             m_table_session_list.Columns.Add(new DataColumn("host_name", typeof(string)));              // ホスト名
+            m_table_session_list.Columns.Add(new DataColumn("client_net_address", typeof(string)));              // ホスト名
             m_table_session_list.Columns.Add(new DataColumn("workload_group", typeof(string)));         // ワークロードグループ
             m_table_session_list.Columns.Add(new DataColumn("isblocked", typeof(bool)));                // ブロックされているか
             
@@ -137,6 +138,7 @@ namespace DBKeeper
             getSessionSQL += "     , case when r2.session_id is not null and (r.blocking_session_id = 0 or r.session_id is null) then '1' else '' end as top_block";
             getSessionSQL += "     , s.memory_usage * 8192 / 1024 as memory_usage";
             getSessionSQL += "     , isnull(s.host_name, '') as host_name";
+            getSessionSQL += "     , isnull(c.client_net_address, '') as client_net_address";
             getSessionSQL += "     , isnull(g.name, '') as workload_group";
             getSessionSQL += "  from sys.dm_exec_sessions s";
             getSessionSQL += "  left outer join sys.dm_exec_connections c";
@@ -190,6 +192,7 @@ namespace DBKeeper
                 newRow["top_block"] = tmpDataTable.Rows[i]["top_block"];
                 newRow["memory_usage"] = tmpDataTable.Rows[i]["memory_usage"];
                 newRow["host_name"] = tmpDataTable.Rows[i]["host_name"];
+                newRow["client_net_address"] = tmpDataTable.Rows[i]["client_net_address"];
                 newRow["workload_group"] = tmpDataTable.Rows[i]["workload_group"];
 
                 if ( tmpDataTable.Rows[i]["blocking_from"].ToString() != "" )

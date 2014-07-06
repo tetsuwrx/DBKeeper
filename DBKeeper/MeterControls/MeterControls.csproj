@@ -65,6 +65,9 @@
     <Compile Include="BlockingAlert.xaml.cs">
       <DependentUpon>BlockingAlert.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChartControl.xaml.cs">
+      <DependentUpon>ChartControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ReverseShortMeterControl.xaml.cs">
       <DependentUpon>ReverseShortMeterControl.xaml</DependentUpon>
     </Compile>
@@ -76,7 +79,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ChartControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="CircleMeterControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RevMeterControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -86,6 +97,9 @@
     </Page>
     <Compile Include="CircleMeterControl.xaml.cs">
       <DependentUpon>CircleMeterControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RevMeterControl.xaml.cs">
+      <DependentUpon>RevMeterControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ShortMeterControl.xaml.cs">
       <DependentUpon>ShortMeterControl.xaml</DependentUpon>

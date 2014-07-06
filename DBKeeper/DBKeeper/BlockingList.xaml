@@ -129,6 +129,14 @@
                 <DataGridTextColumn
                     CanUserReorder="True"
                     CanUserSort="True"
+                    Header="IPアドレス"
+                    x:Name="col_client_net_address"
+                    Binding="{Binding client_net_address}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
                     Header="Workload Group"
                     x:Name="col_workload_group"
                     Binding="{Binding workload_group}"

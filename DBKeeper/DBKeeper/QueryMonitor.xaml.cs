@@ -68,7 +68,7 @@ namespace DBKeeper
             {
                 InitTables();                   // テーブルの初期化
 
-                ViewSessionList();              // セッションリストの表示
+                ViewExecutingQueryList();              // セッションリストの表示
             }
             catch (Exception ex)
             {
@@ -142,14 +142,11 @@ namespace DBKeeper
         /// <summary>
         /// 実行中のクエリと読み取りI/Oコストの高いクエリを取得し、DataGridへ反映する
         /// </summary>
-        private void ViewSessionList()
+        private void ViewExecutingQueryList()
         {
             DBAccess dbAccess = new DBAccess();                                                         // データベースアクセス用共通クラス
             DataSet tmpDataSet = new DataSet();
             DataTable tmpDataTable = new DataTable();
-
-            DataSet tmpDataSet2 = new DataSet();
-            DataTable tmpDataTable2 = new DataTable();
 
             string getQueryListSQL = "";
             string errorMessage = "";
@@ -192,6 +189,19 @@ namespace DBKeeper
                 // 新規の行をデータグリッドへ反映
                 m_table_query_list.Rows.Add(newRow);
             }
+        }
+
+        /// <summary>
+        /// 実行中のクエリと読み取りI/Oコストの高いクエリを取得し、DataGridへ反映する
+        /// </summary>
+        private void ViewDiskIoHighCostList()
+        {
+            DBAccess dbAccess = new DBAccess();                                                         // データベースアクセス用共通クラス
+            DataSet tmpDataSet = new DataSet();
+            DataTable tmpDataTable = new DataTable();
+
+            string getQueryListSQL = "";
+            string errorMessage = "";
 
             // 読み取りI/Oコストが高いクエリを取得
             getQueryListSQL = "select TOP 20 qt.text as query_text";
@@ -209,29 +219,29 @@ namespace DBKeeper
             getQueryListSQL += " ORDER BY qs.total_logical_reads DESC ";
 
             // SQL実行
-            tmpDataSet2 = dbAccess.GetDataSet(getQueryListSQL, CommonServerSettings.ConnectionString, ref errorMessage);
+            tmpDataSet = dbAccess.GetDataSet(getQueryListSQL, CommonServerSettings.ConnectionString, ref errorMessage);
             if (errorMessage != "")
             {
                 MessageBox.Show(errorMessage);
                 return;
             }
 
-            tmpDataTable2 = tmpDataSet2.Tables[0];
+            tmpDataTable = tmpDataSet.Tables[0];
 
             // レコード間ループ
-            for (int i = 0; i < tmpDataTable2.Rows.Count; i++)
+            for (int i = 0; i < tmpDataTable.Rows.Count; i++)
             {
                 // 行を新規に生成
                 DataRow newRow = m_table_high_cost_query_list.NewRow();
 
-                newRow["query_text"] = tmpDataTable2.Rows[i]["query_text"];
-                newRow["execution_count"] = tmpDataTable2.Rows[i]["execution_count"];
-                newRow["total_logical_reads"] = tmpDataTable2.Rows[i]["total_logical_reads"];
-                newRow["last_logical_reads"] = tmpDataTable2.Rows[i]["last_logical_reads"];
-                newRow["total_elapsed_time"] = tmpDataTable2.Rows[i]["total_elapsed_time"];
-                newRow["last_elapsed_time"] = tmpDataTable2.Rows[i]["last_elapsed_time"];
-                newRow["last_execution_time"] = tmpDataTable2.Rows[i]["last_execution_time"];
-                newRow["query_plan"] = tmpDataTable2.Rows[i]["query_plan"];
+                newRow["query_text"] = tmpDataTable.Rows[i]["query_text"];
+                newRow["execution_count"] = tmpDataTable.Rows[i]["execution_count"];
+                newRow["total_logical_reads"] = tmpDataTable.Rows[i]["total_logical_reads"];
+                newRow["last_logical_reads"] = tmpDataTable.Rows[i]["last_logical_reads"];
+                newRow["total_elapsed_time"] = tmpDataTable.Rows[i]["total_elapsed_time"];
+                newRow["last_elapsed_time"] = tmpDataTable.Rows[i]["last_elapsed_time"];
+                newRow["last_execution_time"] = tmpDataTable.Rows[i]["last_execution_time"];
+                newRow["query_plan"] = tmpDataTable.Rows[i]["query_plan"];
 
                 // 新規の行をデータグリッドへ反映
                 m_table_high_cost_query_list.Rows.Add(newRow);
@@ -273,11 +283,74 @@ namespace DBKeeper
             m_table_high_cost_query_list.Clear();
 
             // データ取得＆グリッド反映
-            ViewSessionList();
+            ViewExecutingQueryList();
+            ViewDiskIoHighCostList();
 
             // データコンテキストの設定
             ExecutingQueryList.DataContext = m_table_query_list;
             LogicalReadHighCostQueryList.DataContext = m_table_high_cost_query_list;
+        }
+
+        /// <summary>
+        /// クエリのテキストを表示する
+        /// </summary>
+        /// <param name="paramSessionID">セッションID</param>
+        /// <param name="queryText">クエリ詳細</param>
+        private void ShowQueryText(string paramSessionID, string paramQueryText)
+        {
+            QueryText queryText = new QueryText(paramQueryText);
+            
+            queryText.Owner = this;
+            queryText.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+            queryText.Title = "【セッションID:" + paramSessionID + "】" + queryText.Title;
+
+            queryText.Show();
+
+        }
+
+        /// <summary>
+        /// 「実行中のクエリ」グリッドのダブルクリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExecutingQueryList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            string sessionId = "";                          // セッションID
+            string queryText = "";                          // クエリテキスト
+
+            var dataContext = ExecutingQueryList.Items[ExecutingQueryList.SelectedIndex] as DataRowView;
+
+            // 選択行からセッションID、クエリテキストを取得
+            sessionId = dataContext.Row[0].ToString();
+            queryText = dataContext.Row[5].ToString();
+
+            // 画面の表示
+            ShowQueryText(sessionId, queryText);
+        }
+
+        private void DisplayDiskQueryIoListButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 各リストテーブルの内容をクリア
+            m_table_high_cost_query_list.Clear();
+
+            // データ取得＆グリッド反映
+            ViewDiskIoHighCostList();
+
+            // データコンテキストの設定
+            LogicalReadHighCostQueryList.DataContext = m_table_high_cost_query_list;
+
+        }
+
+        private void DisplayExecutingQueryListButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 各リストテーブルの内容をクリア
+            m_table_query_list.Clear();
+
+            // データ取得＆グリッド反映
+            ViewExecutingQueryList();
+
+            // データコンテキストの設定
+            ExecutingQueryList.DataContext = m_table_query_list;
         }
     }
 }
