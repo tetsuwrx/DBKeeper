@@ -56,7 +56,7 @@ namespace MeterControl
                     //angle += lvalue * 27;
                     double lvalue = value;
 
-                    angle += lvalue * 1.35;
+                    angle += lvalue * 1.2;
                 }
                 Duration duration = new Duration(TimeSpan.FromMilliseconds(500));
                 DoubleAnimation animation = new DoubleAnimation(angle, duration);

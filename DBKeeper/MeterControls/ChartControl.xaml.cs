@@ -120,5 +120,21 @@ namespace MeterControls
                 return currentValue;
             }
         }
+
+        /// <summary>
+        /// タイトルを設定・取得する
+        /// </summary>
+        public string Title
+        {
+            set
+            {
+                TitleLabel.Text = value;
+            }
+            get
+            {
+                return TitleLabel.Text.ToString();
+            }
+
+        }
     }
 }

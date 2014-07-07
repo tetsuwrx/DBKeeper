@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Height="205" Width="230">
+             mc:Ignorable="d" Height="205" Width="220">
     <Canvas Margin="2,0,48,0">
         <TextBlock Name="tbTitle" Text="CPU Usage" FontSize="18" TextAlignment="Center"
-  HorizontalAlignment="Center" Height="24" Width="110" Canvas.Left="74" Canvas.Top="161" FontStyle="Italic" FontWeight="Bold" />
-        <TextBlock Name="tbValue" Text="0%" FontSize="20" Canvas.Top="159" Canvas.Left="143" Width="84" TextAlignment="Right" FontStyle="Italic"/>
+  HorizontalAlignment="Center" Height="24" Width="110" Canvas.Left="93" Canvas.Top="137" FontStyle="Italic" FontWeight="Bold" />
+        <TextBlock Name="tbValue" Text="0%" FontSize="20" Canvas.Top="164" Canvas.Left="93" Width="84" TextAlignment="Right" FontStyle="Italic"/>
         <!-- 目盛のアーチ -->
         <Path Stroke="DarkGray" StrokeThickness="2" Canvas.Left="7" Canvas.Top="-16">
             <Path.Data>
@@ -204,8 +204,8 @@
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
-        
-        
+
+
         <!--
         <Path Stroke="Aqua"  StrokeThickness="15" Canvas.Top="64" Canvas.Left="62">
             <Path.Data>
@@ -224,12 +224,12 @@
             </Path.Data>
         </Path>
         -->
-        
+
         <!-- 目盛の数字だよ -->
         <TextBlock Text="0" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="50" Y="170"/>
+                    <TranslateTransform X="50" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="-45"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
@@ -237,7 +237,7 @@
         <TextBlock Text="30" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="45" Y="170"/>
+                    <TranslateTransform X="45" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="-18"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
@@ -245,7 +245,7 @@
         <TextBlock Text="40" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="45" Y="170"/>
+                    <TranslateTransform X="45" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="9"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
@@ -253,7 +253,7 @@
         <TextBlock Text="50" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="45" Y="170"/>
+                    <TranslateTransform X="45" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="36"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
@@ -261,7 +261,7 @@
         <TextBlock Text="60" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="45" Y="170"/>
+                    <TranslateTransform X="45" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="63"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
@@ -269,7 +269,7 @@
         <TextBlock Text="70" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="45" Y="170"/>
+                    <TranslateTransform X="45" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="90"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
@@ -277,7 +277,7 @@
         <TextBlock Text="80" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="45" Y="170"/>
+                    <TranslateTransform X="45" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="117"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
@@ -285,7 +285,7 @@
         <TextBlock Text="90" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="45" Y="170"/>
+                    <TranslateTransform X="45" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="144"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
@@ -293,7 +293,7 @@
         <TextBlock Text="100" FontSize="14" Canvas.Left="-13" Canvas.Top="-66">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                <TranslateTransform X="45" Y="170"/>
+                    <TranslateTransform X="45" Y="170"/>
                     <RotateTransform CenterX="120" CenterY="180" Angle="171"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>

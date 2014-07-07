@@ -99,10 +99,12 @@ namespace DBKeeper
             DateTime nowTime = DateTime.Now;
 
             CpuMeter01.MeterTitle = "CPU";
+            CpuHistory01.Title = "CPU使用率(%)";
             MemoryMeter01.MeterTitle = "Memory";
             BufferCacheHitRate01.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate01.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter01.BarTitle = "Disk I/O";
+            LockHistory01.Title = "待機中のタスク";
             if (CommonServer01Settings.MonitoringStatus == "On")
             {
                 Server1Title.Content = CommonServer01Settings.HostName;
@@ -114,10 +116,12 @@ namespace DBKeeper
             }
 
             CpuMeter02.MeterTitle = "CPU";
+            CpuHistory02.Title = "CPU使用率(%)";
             MemoryMeter02.MeterTitle = "Memory";
             BufferCacheHitRate02.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate02.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter02.BarTitle = "Disk I/O";
+            LockHistory02.Title = "待機中のタスク";
             if (CommonServer02Settings.MonitoringStatus == "On")
             {
                 Server2Title.Content = CommonServer02Settings.HostName;
@@ -129,10 +133,12 @@ namespace DBKeeper
             }
 
             CpuMeter03.MeterTitle = "CPU";
+            CpuHistory03.Title = "CPU使用率(%)";
             MemoryMeter03.MeterTitle = "Memory";
             BufferCacheHitRate03.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate03.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter03.BarTitle = "Disk I/O";
+            LockHistory03.Title = "待機中のタスク";
             if (CommonServer03Settings.MonitoringStatus == "On")
             {
                 Server3Title.Content = CommonServer03Settings.HostName;
@@ -144,10 +150,12 @@ namespace DBKeeper
             }
 
             CpuMeter04.MeterTitle = "CPU";
+            CpuHistory04.Title = "CPU使用率(%)";
             MemoryMeter04.MeterTitle = "Memory";
             BufferCacheHitRate04.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate04.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter04.BarTitle = "Disk I/O";
+            LockHistory04.Title = "待機中のタスク";
             if (CommonServer04Settings.MonitoringStatus == "On")
             {
                 Server4Title.Content = CommonServer04Settings.HostName;
@@ -312,6 +320,7 @@ namespace DBKeeper
                     cpuUseage = dbAccess.GetCpuUseage(CommonServer01Settings.ConnectionString, CommonServer01Settings.InstanceName);
 
                     CpuMeter01.MeterValue = cpuUseage;
+                    CpuHistory01.PercentageValue = cpuUseage;
 
                     isChecked = true;
                 }
@@ -580,6 +589,7 @@ namespace DBKeeper
                     cpuUseage = dbAccess.GetCpuUseage(CommonServer02Settings.ConnectionString, CommonServer02Settings.InstanceName);
 
                     CpuMeter02.MeterValue = cpuUseage;
+                    CpuHistory02.PercentageValue = cpuUseage;
 
                     isChecked = true;
                 }
@@ -845,6 +855,7 @@ namespace DBKeeper
                     cpuUseage = dbAccess.GetCpuUseage(CommonServer03Settings.ConnectionString, CommonServer03Settings.InstanceName);
 
                     CpuMeter03.MeterValue = cpuUseage;
+                    CpuHistory03.PercentageValue = cpuUseage;
 
                     isChecked = true;
                 }
@@ -1110,6 +1121,7 @@ namespace DBKeeper
                     cpuUseage = dbAccess.GetCpuUseage(CommonServer04Settings.ConnectionString, CommonServer04Settings.InstanceName);
 
                     CpuMeter04.MeterValue = cpuUseage;
+                    CpuHistory04.PercentageValue = cpuUseage;
 
                     isChecked = true;
                 }

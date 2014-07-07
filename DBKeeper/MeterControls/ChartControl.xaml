@@ -3,25 +3,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="300">
-    <Grid>
-        <Rectangle Fill="Black" HorizontalAlignment="Left" Height="60" Stroke="DarkGray" VerticalAlignment="Top" Width="195"/>
-        <Line Stroke="#FF64F764" X1="0" Y1="15" X2="195" Y2="15" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="0" Y1="30" X2="195" Y2="30" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="0" Y1="45" X2="195" Y2="45" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="15" Y1="0" X2="15" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="30" Y1="0" X2="30" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="45" Y1="0" X2="45" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="60" Y1="0" X2="60" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="75" Y1="0" X2="75" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="90" Y1="0" X2="90" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="105" Y1="0" X2="105" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="120" Y1="0" X2="120" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="135" Y1="0" X2="135" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="150" Y1="0" X2="150" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="165" Y1="0" X2="165" Y2="60" StrokeThickness="1"/>
-        <Line Stroke="#FF64F764" X1="180" Y1="0" X2="180" Y2="60" StrokeThickness="1"/>
+             mc:Ignorable="d" Height="85" Width="195">
+    <Grid HorizontalAlignment="Left" Width="195" Height="85" VerticalAlignment="Top">
+        <Rectangle Fill="Black" HorizontalAlignment="Left" Height="60" Stroke="DarkGray" VerticalAlignment="Top" Width="195" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="0" Y1="15" X2="195" Y2="15" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="0" Y1="30" X2="195" Y2="30" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="0" Y1="45" X2="195" Y2="45" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="15" Y1="0" X2="15" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="30" Y1="0" X2="30" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="45" Y1="0" X2="45" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="60" Y1="0" X2="60" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="75" Y1="0" X2="75" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="90" Y1="0" X2="90" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="105" Y1="0" X2="105" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="120" Y1="0" X2="120" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="135" Y1="0" X2="135" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="150" Y1="0" X2="150" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="165" Y1="0" X2="165" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
+        <Line Stroke="#FF64F764" X1="180" Y1="0" X2="180" Y2="60" StrokeThickness="1" Margin="0,25,0,0"/>
         <Polygon Name="DisplayGraph" Grid.Row="0" Fill="LightGreen"
                  Points="0,8
                          0,60
@@ -53,7 +52,9 @@
                          15,60
                          7,60
                          0,60"
-                 Stroke="DarkGreen" StrokeThickness="1" />
+                 Stroke="DarkGreen" StrokeThickness="1" Margin="0,25,0,0" />
+        <!-- <Label x:Name="TitleLabel"  Content="Title" HorizontalAlignment="Center" VerticalAlignment="Top" Width="195"/> -->
+        <TextBlock x:Name="TitleLabel" Text="Title" Width="84" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Margin="55,5,56,60"/>
 
 
     </Grid>

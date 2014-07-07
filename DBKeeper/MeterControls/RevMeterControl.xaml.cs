@@ -85,6 +85,7 @@ namespace MeterControl
                 else
                 {
                     //tbValue.Foreground = null;
+                    tbValue.Foreground = new SolidColorBrush(Color.FromArgb(255, 249, 242, 242));
                     tbValue.FontWeight = FontWeights.Normal;
                 }
             }

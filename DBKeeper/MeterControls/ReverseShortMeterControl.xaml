@@ -3,12 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="181" d:DesignWidth="243">
-    <Canvas Height="186">
-        <TextBlock Name="tbTitle" Text="Buffer Cache Hit Rate" FontSize="20" TextAlignment="Center"
-  HorizontalAlignment="Center" Height="32" Width="240" Canvas.Left="0" Canvas.Top="154" />
-        <TextBlock Name="tbValue" Text="0" FontSize="20" Canvas.Top="130" Canvas.Left="0" Width="240" TextAlignment="Center"/>
+             mc:Ignorable="d" Height="150" Width="200">
+    <Canvas Margin="0,0,43,31">
+        <TextBlock Name="tbTitle" Text="Buffer Cache Hit Rate" FontSize="16" TextAlignment="Center"
+  HorizontalAlignment="Center" Height="32" Width="200" Canvas.Left="0" Canvas.Top="126" />
+        <TextBlock Name="tbValue" Text="0" FontSize="18" Canvas.Top="102" Canvas.Left="0" Width="240" TextAlignment="Center"/>
         <!-- 5つのRectangleは、目盛 -->
         <Rectangle Width="20" Height="4" Fill="Red" Canvas.Left="13" Canvas.Top="-163">
             <Rectangle.RenderTransform>
@@ -19,7 +18,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-13.5"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-12"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -27,7 +26,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-27"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-24"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -35,7 +34,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-40.5"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-36"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -43,7 +42,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-54"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-48"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -51,7 +50,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-67.5"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-60"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -59,7 +58,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-81"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-72"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -67,7 +66,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-94.5"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-84"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -75,7 +74,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-108"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-96"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -83,7 +82,7 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-121.5"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-108"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
@@ -91,21 +90,21 @@
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="20" Y="178"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-135"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-120"/>
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
         <!-- 目盛のアーチ -->
-        <Path Stroke="Black" StrokeThickness="1" Canvas.Top="17" Canvas.Left="33">
+        <Path Stroke="DarkGray" StrokeThickness="5" Canvas.Top="17" Canvas.Left="33">
             <Path.Data>
                 <PathGeometry>
                     <PathGeometry.Figures>
                         <PathFigure StartPoint="0,0">
                             <PathFigure.Segments>
                                 <ArcSegment
-                                    Size="100,100" RotationAngle="-45"
+                                    Size="80,80" RotationAngle="-45"
                                     IsLargeArc="False" SweepDirection="Counterclockwise"
-                                    Point="172,69"/>
+                                    Point="119,68"/>
                             </PathFigure.Segments>
                         </PathFigure>
                     </PathGeometry.Figures>
@@ -122,7 +121,7 @@
             <TextBlock.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="40" Y="170"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-67.5"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-60"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
@@ -130,19 +129,19 @@
             <TextBlock.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="40" Y="170"/>
-                    <RotateTransform CenterX="120" CenterY="180" Angle="-135"/>
+                    <RotateTransform CenterX="98" CenterY="181" Angle="-120"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
         <!-- 針だよ -->
-        <Path Stroke="Blue" StrokeThickness="1" Canvas.Top="12" Canvas.Left="128" Opacity="70" RenderTransformOrigin="0.5,0.5">
+        <Path Stroke="Blue" StrokeThickness="1" Canvas.Top="12" Canvas.Left="103" Opacity="70" RenderTransformOrigin="0.5,0.5">
             <Path.Data>
                 <PathGeometry>
                     <PathGeometry.Figures>
                         <PathFigure StartPoint="0,0">
                             <PathFigure.Segments>
-                                <LineSegment Point="5,110"/>
-                                <LineSegment Point="5,110"/>
+                                <LineSegment Point="5,80"/>
+                                <LineSegment Point="5,80"/>
                                 <LineSegment Point="10,0"/>
                             </PathFigure.Segments>
                         </PathFigure>
@@ -159,7 +158,7 @@
                 </LinearGradientBrush>
             </Path.Fill>
         </Path>
-        <Ellipse Height="30" Canvas.Left="118" Stroke="DarkGray" StrokeThickness="2" Width="30" Canvas.Top="2">
+        <Ellipse Height="20" Canvas.Left="98" Stroke="DarkGray" StrokeThickness="2" Width="20" Canvas.Top="7">
             <Ellipse.Fill>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="0"/>
