@@ -104,7 +104,7 @@ namespace DBKeeper
             BufferCacheHitRate01.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate01.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter01.BarTitle = "Disk I/O";
-            LockHistory01.Title = "待機中のタスク";
+            WaitHistory01.Title = "待機中のタスク";
             if (CommonServer01Settings.MonitoringStatus == "On")
             {
                 Server1Title.Content = CommonServer01Settings.HostName;
@@ -121,7 +121,7 @@ namespace DBKeeper
             BufferCacheHitRate02.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate02.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter02.BarTitle = "Disk I/O";
-            LockHistory02.Title = "待機中のタスク";
+            WaitHistory02.Title = "待機中のタスク";
             if (CommonServer02Settings.MonitoringStatus == "On")
             {
                 Server2Title.Content = CommonServer02Settings.HostName;
@@ -138,7 +138,7 @@ namespace DBKeeper
             BufferCacheHitRate03.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate03.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter03.BarTitle = "Disk I/O";
-            LockHistory03.Title = "待機中のタスク";
+            WaitHistory03.Title = "待機中のタスク";
             if (CommonServer03Settings.MonitoringStatus == "On")
             {
                 Server3Title.Content = CommonServer03Settings.HostName;
@@ -155,7 +155,7 @@ namespace DBKeeper
             BufferCacheHitRate04.MeterTitle = "Buffer Cache HitRate";
             ProcedureCacheHitRate04.MeterTitle = "Proc Cache HitRate";
             Disk_I_O_Meter04.BarTitle = "Disk I/O";
-            LockHistory04.Title = "待機中のタスク";
+            WaitHistory04.Title = "待機中のタスク";
             if (CommonServer04Settings.MonitoringStatus == "On")
             {
                 Server4Title.Content = CommonServer04Settings.HostName;
@@ -537,6 +537,36 @@ namespace DBKeeper
                 MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+            // 待機中のタスク数をカウント
+            if (timeSpan >= CommonServer01Settings.BlockingCheckCycle)
+            {
+                try
+                {
+                    int waitingTaskCount = 0;                       // 待機中のタスク数
+
+                    waitingTaskCount = dbAccess.GetWaitingTaskCount(CommonServer01Settings.ConnectionString);
+
+                    WaitHistory01.PercentageValue = waitingTaskCount;
+
+                    string titleString = "待機中のタスク" + "(" + waitingTaskCount.ToString() + ")";
+
+                    WaitHistory01.Title = titleString;
+
+                }
+                catch (Exception ex)
+                {
+                    string errorMsg = "エラーが発生しました。" + "\n";
+                    errorMsg += "監視対象：" + "\n";
+                    errorMsg += "　Server01" + "\n";
+                    errorMsg += "エラー発生個所:" + "\n";
+                    errorMsg += "　待機タスク数チェック" + "\n";
+                    errorMsg += "エラー詳細:" + "\n";
+                    errorMsg += "　" + ex.Message;
+
+                    MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+
             if (isChecked == true)
             {
                 BeforeExecTime01.Content = DateTime.Now.ToString();
@@ -802,6 +832,36 @@ namespace DBKeeper
                 errorMsg += "　" + ex.Message;
 
                 MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            // 待機中のタスク数をカウント
+            if (timeSpan >= CommonServer02Settings.BlockingCheckCycle)
+            {
+                try
+                {
+                    int waitingTaskCount = 0;                       // 待機中のタスク数
+
+                    waitingTaskCount = dbAccess.GetWaitingTaskCount(CommonServer02Settings.ConnectionString);
+
+                    WaitHistory02.PercentageValue = waitingTaskCount;
+
+                    string titleString = "待機中のタスク" + "(" + waitingTaskCount.ToString() + ")";
+
+                    WaitHistory02.Title = titleString;
+
+                }
+                catch (Exception ex)
+                {
+                    string errorMsg = "エラーが発生しました。" + "\n";
+                    errorMsg += "監視対象：" + "\n";
+                    errorMsg += "　Server02" + "\n";
+                    errorMsg += "エラー発生個所:" + "\n";
+                    errorMsg += "　待機タスク数チェック" + "\n";
+                    errorMsg += "エラー詳細:" + "\n";
+                    errorMsg += "　" + ex.Message;
+
+                    MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
 
             if (isChecked == true)
@@ -1074,6 +1134,36 @@ namespace DBKeeper
             {
                 BeforeExecTime03.Content = DateTime.Now.ToString();
             }
+
+            // 待機中のタスク数をカウント
+            if (timeSpan >= CommonServer03Settings.BlockingCheckCycle)
+            {
+                try
+                {
+                    int waitingTaskCount = 0;                       // 待機中のタスク数
+
+                    waitingTaskCount = dbAccess.GetWaitingTaskCount(CommonServer03Settings.ConnectionString);
+
+                    WaitHistory03.PercentageValue = waitingTaskCount;
+
+                    string titleString = "待機中のタスク" + "(" + waitingTaskCount.ToString() + ")";
+
+                    WaitHistory03.Title = titleString;
+
+                }
+                catch (Exception ex)
+                {
+                    string errorMsg = "エラーが発生しました。" + "\n";
+                    errorMsg += "監視対象：" + "\n";
+                    errorMsg += "　Server03" + "\n";
+                    errorMsg += "エラー発生個所:" + "\n";
+                    errorMsg += "　ブロッキング数チェック" + "\n";
+                    errorMsg += "エラー詳細:" + "\n";
+                    errorMsg += "　" + ex.Message;
+
+                    MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         /// <summary>
@@ -1337,6 +1427,35 @@ namespace DBKeeper
                 MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+            // 待機中のタスク数をカウント
+            if (timeSpan >= CommonServer04Settings.BlockingCheckCycle)
+            {
+                try
+                {
+                    int waitingTaskCount = 0;                       // 待機中のタスク数
+
+                    waitingTaskCount = dbAccess.GetWaitingTaskCount(CommonServer04Settings.ConnectionString);
+
+                    WaitHistory04.PercentageValue = waitingTaskCount;
+
+                    string titleString = "待機中のタスク" + "(" + waitingTaskCount.ToString() + ")";
+
+                    WaitHistory04.Title = titleString;
+                }
+                catch (Exception ex)
+                {
+                    string errorMsg = "エラーが発生しました。" + "\n";
+                    errorMsg += "監視対象：" + "\n";
+                    errorMsg += "　Server04" + "\n";
+                    errorMsg += "エラー発生個所:" + "\n";
+                    errorMsg += "　ブロッキング数チェック" + "\n";
+                    errorMsg += "エラー詳細:" + "\n";
+                    errorMsg += "　" + ex.Message;
+
+                    MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+
             if (isChecked == true)
             {
                 BeforeExecTime04.Content = DateTime.Now.ToString();
@@ -1395,11 +1514,17 @@ namespace DBKeeper
                 return;
             }
 
-            BlockingList blockingList = new BlockingList(windowNo);
+            /*
+            SessionList blockingList = new SessionList(windowNo);
             blockingList.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
             blockingList.Owner = this;
 
             blockingList.Show();
+             * */
+
+            BlockingTree blockingTree = new BlockingTree(windowNo);
+            blockingTree.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+            blockingTree.Show();
         }
 
         /// <summary>
@@ -1460,7 +1585,6 @@ namespace DBKeeper
         {
             OpenQueryMonitor(CommonServer04Settings.MonitoringStatus, "04");
         }
-
         
         /*
         private void Button_Click_1(object sender, RoutedEventArgs e)

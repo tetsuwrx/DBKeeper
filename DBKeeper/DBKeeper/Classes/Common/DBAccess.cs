@@ -551,5 +551,48 @@ namespace DBKeeper.Classes.Common
 
             return retValue;
         }
+
+        /// <summary>
+        /// 待機中のタスクの数をカウントする
+        /// </summary>
+        /// <param name="CurrentConnectionString">接続文字列</param>
+        /// <returns>タスク数(int)</returns>
+        public int GetWaitingTaskCount(string CurrentConnectionString)
+        {
+            int retValue = 0;                // 戻り値用
+            string selectSQL = "";              // 取得用SQL
+            string errorMessage = "";           // エラーメッセージ
+            DataSet dataSet = new DataSet();
+            DataTable dataTable = new DataTable();
+
+            selectSQL = "select count(1) as cnt" + "\n";
+            selectSQL += "  from sys.dm_os_waiting_tasks" + "\n";
+            selectSQL += " where session_id > 50;";
+
+            dataSet = GetDataSet(selectSQL, CurrentConnectionString, ref errorMessage);
+
+            if (errorMessage == "")
+            {
+                if (dataSet.Tables.Count > 0)
+                {
+                    dataTable = dataSet.Tables[0];
+
+                    try
+                    {
+                        retValue = int.Parse(dataTable.Rows[0]["cnt"].ToString());
+                    }
+                    catch
+                    {
+                        retValue = 0;
+                    }
+
+                }
+            }
+
+            dataSet.Dispose();
+            dataTable.Dispose();
+
+            return retValue;
+        }
     }
 }

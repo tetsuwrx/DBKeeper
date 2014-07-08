@@ -77,6 +77,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BlockingTree.xaml.cs">
+      <DependentUpon>BlockingTree.xaml</DependentUpon>
+    </Compile>
     <Compile Include="QueryMonitor.xaml.cs">
       <DependentUpon>QueryMonitor.xaml</DependentUpon>
     </Compile>
@@ -86,7 +89,11 @@
     <Compile Include="QueryText.xaml.cs">
       <DependentUpon>QueryText.xaml</DependentUpon>
     </Compile>
-    <Page Include="BlockingList.xaml">
+    <Page Include="SessionList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BlockingTree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -98,8 +105,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BlockingList.xaml.cs">
-      <DependentUpon>BlockingList.xaml</DependentUpon>
+    <Compile Include="SessionList.xaml.cs">
+      <DependentUpon>SessionList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Common\AppSettings.cs" />
     <Compile Include="Classes\Common\DBAccess.cs" />

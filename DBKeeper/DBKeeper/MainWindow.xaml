@@ -158,10 +158,10 @@
         <MeterControls:ChartControl x:Name="CpuHistory02" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="666,87,0,0" Height="85"/>
         <MeterControls:ChartControl x:Name="CpuHistory03" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="33,545,0,0" Height="85" Width="195"/>
         <MeterControls:ChartControl x:Name="CpuHistory04" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="666,545,0,0" Height="85" Width="195"/>
-        <MeterControls:ChartControl x:Name="LockHistory01" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="411,87,0,0"/>
-        <MeterControls:ChartControl x:Name="LockHistory02" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1039,87,0,0" Width="195"/>
-        <MeterControls:ChartControl x:Name="LockHistory03" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="411,545,0,0" Height="85" Width="195"/>
-        <MeterControls:ChartControl x:Name="LockHistory04" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1039,545,0,0" Height="85" Width="195"/>
+        <MeterControls:ChartControl x:Name="WaitHistory01" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="411,87,0,0"/>
+        <MeterControls:ChartControl x:Name="WaitHistory02" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1039,87,0,0" Width="195"/>
+        <MeterControls:ChartControl x:Name="WaitHistory03" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="411,545,0,0" Height="85" Width="195"/>
+        <MeterControls:ChartControl x:Name="WaitHistory04" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1039,545,0,0" Height="85" Width="195"/>
 
 
     </Grid>

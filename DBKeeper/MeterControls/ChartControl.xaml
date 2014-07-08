@@ -54,7 +54,7 @@
                          0,60"
                  Stroke="DarkGreen" StrokeThickness="1" Margin="0,25,0,0" />
         <!-- <Label x:Name="TitleLabel"  Content="Title" HorizontalAlignment="Center" VerticalAlignment="Top" Width="195"/> -->
-        <TextBlock x:Name="TitleLabel" Text="Title" Width="84" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Margin="55,5,56,60"/>
+        <TextBlock x:Name="TitleLabel" Text="Title" Width="111" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Margin="48,5,36,60"/>
 
 
     </Grid>
