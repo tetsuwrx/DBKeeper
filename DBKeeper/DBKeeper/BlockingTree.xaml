@@ -4,7 +4,7 @@
         Title="SQL Serverデータベース監視ツール ～DBKeeper～ - ブロッキング情報" Height="628" Width="1000" ResizeMode="CanMinimize">
     <Grid Margin="0,0,0,10">
         <Label Content="ブロッキングリスト" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,0,0" Width="200"/>
-        <TreeView x:Name="TreeViewBlocking" HorizontalAlignment="Left" Height="500" VerticalAlignment="Top" Width="250" Margin="10,40,0,0"/>
+        <TreeView x:Name="TreeViewBlocking" HorizontalAlignment="Left" Height="500" VerticalAlignment="Top" Width="250" Margin="10,40,0,0" SelectedItemChanged="SelectedItemChanged"/>
         <TextBox x:Name="SessionInfo" HorizontalAlignment="Left" Height="500" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="717" Margin="265,40,0,0" BorderBrush="DimGray" BorderThickness="2" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Visible"/>
         <Label Content="セッション詳細" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="265,10,0,0" Width="200"/>
         <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Margin="901,547,0,0" Height="30" Click="Button_Click"/>

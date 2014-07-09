@@ -25,6 +25,8 @@ namespace DBKeeper
 
         private ServerSettings CommonServerSettings;
 
+        DataTable tempSessionList = new DataTable();
+
         public BlockingTree(string targetServer)
         {
             InitializeComponent();
@@ -56,6 +58,10 @@ namespace DBKeeper
             this.Title = "【ホスト名:" + CommonServerSettings.HostName + "】" + this.Title;
 
             MakeBlockingTreeList();
+
+            // セッションのリストをメモリ上に保存
+            tempSessionList = GetSessionList(CommonServerSettings.ConnectionString);
+
         }
 
         /// <summary>
@@ -64,7 +70,7 @@ namespace DBKeeper
         private void MakeBlockingTreeList()
         {
             DataTable tempDataTable = new DataTable();
-
+            
             tempDataTable = GetBlockingList(CommonServerSettings.ConnectionString);
 
             for (int i = 0; i < tempDataTable.Rows.Count; i++)
@@ -295,6 +301,53 @@ namespace DBKeeper
         {
             // 画面を閉じる
             Close();
+        }
+
+        /// <summary>
+        /// 選択項目クリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            // TreeViewの選択された項目
+            TreeViewItem selectedItem = (TreeViewItem)TreeViewBlocking.SelectedItem;
+
+            // 選択されているセッションIDを取得
+            string sessionId = selectedItem.Header.ToString();
+
+            string login_id = "";                                       // ログインID
+            string db_name = "";                                        // データベース名
+            string task_state = "";                                     // タスクの状態
+            string application_name = "";                               // プログラム名
+            string sql_command = "";                                    // 実行中のSQL
+            string session_Info = "";                                    // セッション情報
+
+            // メモリ上に格納してあるセッションのリストから詳細情報を取得
+            for (int i = 0; i < tempSessionList.Rows.Count; i++)
+            {
+                // 該当のセッションIDから必要な情報を取得
+                if (sessionId == tempSessionList.Rows[i]["session_id"].ToString())
+                {
+                    login_id = tempSessionList.Rows[i]["login_id"].ToString();
+                    db_name = tempSessionList.Rows[i]["db_name"].ToString();
+                    task_state = tempSessionList.Rows[i]["task_state"].ToString();
+                    application_name = tempSessionList.Rows[i]["application_name"].ToString();
+                    sql_command = tempSessionList.Rows[i]["sql_command"].ToString();
+
+                    break;
+                }
+            }
+
+            session_Info = "セッションID:" + sessionId + "\n";
+            session_Info += "ログインID:" + login_id + "\n";
+            session_Info += "タスクの状態:" + task_state + "\n";
+            session_Info += "プログラム名:" + application_name + "\n";
+            session_Info += "実行中のSQL:" + sql_command;
+
+            SessionInfo.Text = session_Info;
+
+            
         }
     }
 }

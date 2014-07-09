@@ -1469,7 +1469,7 @@ namespace DBKeeper
         /// <param name="e"></param>
         private void ShowBlockingList01(object sender, MouseButtonEventArgs e)
         {
-            OpenBlockingList(CommonServer01Settings.MonitoringStatus, "01");
+            OpenBlockingList(CommonServer01Settings.MonitoringStatus, "01", BlockingAlert01.IsAlertDisp);
         }
 
         /// <summary>
@@ -1479,7 +1479,7 @@ namespace DBKeeper
         /// <param name="e"></param>
         private void ShowBlockingList02(object sender, MouseButtonEventArgs e)
         {
-            OpenBlockingList(CommonServer02Settings.MonitoringStatus, "02");
+            OpenBlockingList(CommonServer02Settings.MonitoringStatus, "02", BlockingAlert02.IsAlertDisp);
         }
 
         /// <summary>
@@ -1489,7 +1489,7 @@ namespace DBKeeper
         /// <param name="e"></param>
         private void ShowBlockingList03(object sender, MouseButtonEventArgs e)
         {
-            OpenBlockingList(CommonServer03Settings.MonitoringStatus, "03");
+            OpenBlockingList(CommonServer03Settings.MonitoringStatus, "03", BlockingAlert03.IsAlertDisp);
         }
 
         /// <summary>
@@ -1499,7 +1499,7 @@ namespace DBKeeper
         /// <param name="e"></param>
         private void ShowBlockingList04(object sender, MouseButtonEventArgs e)
         {
-            OpenBlockingList(CommonServer04Settings.MonitoringStatus, "04");
+            OpenBlockingList(CommonServer04Settings.MonitoringStatus, "04", BlockingAlert04.IsAlertDisp);
         }
 
         /// <summary>
@@ -1507,7 +1507,7 @@ namespace DBKeeper
         /// </summary>
         /// <param name="monitoringStatus">監視ステータス(On/Off)</param>
         /// <param name="windowNo">ウィンドウの番号(01/02/03/04)</param>
-        private void OpenBlockingList(string monitoringStatus, string windowNo)
+        private void OpenBlockingList(string monitoringStatus, string windowNo, bool isAlert)
         {
             if (monitoringStatus == "Off")
             {
@@ -1522,9 +1522,20 @@ namespace DBKeeper
             blockingList.Show();
              * */
 
-            BlockingTree blockingTree = new BlockingTree(windowNo);
-            blockingTree.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-            blockingTree.Show();
+            if (isAlert == true)
+            {
+                BlockingTree blockingTree = new BlockingTree(windowNo);
+                blockingTree.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+                blockingTree.Show();
+            }
+            else
+            {
+                SessionList blockingList = new SessionList(windowNo);
+                blockingList.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+                blockingList.Owner = this;
+
+                blockingList.Show();
+            }
         }
 
         /// <summary>

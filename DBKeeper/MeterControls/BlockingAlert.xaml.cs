@@ -30,7 +30,6 @@ namespace MeterControls
             InitializeComponent();
         }
 
-        
         /// <summary>
         /// 引数にて渡された値を見て、警告表示をするかどうかを判断する
         /// </summary>
@@ -55,6 +54,18 @@ namespace MeterControls
                 AlertDisp = false;
 
                 GradientStopColor.Color = Color.FromRgb(16, 16, 245);           // 青色
+            }
+        }
+
+        public bool IsAlertDisp
+        {
+            set
+            {
+                AlertDisp = value;
+            }
+            get
+            {
+                return AlertDisp;
             }
         }
     }
