@@ -24,6 +24,7 @@ namespace DBKeeper
         private AppSettings GlobalCommonSettings;
 
         private ServerSettings CommonServerSettings;
+        private string WINDOW_NO;
 
         DataTable tempSessionList = new DataTable();
 
@@ -34,6 +35,8 @@ namespace DBKeeper
             // 共通クラスの生成と設定ファイル読み込み
             AppSettings commonCls = new AppSettings();
             GlobalCommonSettings = commonCls;
+
+            WINDOW_NO = targetServer;
 
             switch (targetServer)
             {
@@ -57,10 +60,10 @@ namespace DBKeeper
             // タイトルにホスト名をつける
             this.Title = "【ホスト名:" + CommonServerSettings.HostName + "】" + this.Title;
 
-            MakeBlockingTreeList();
-
             // セッションのリストをメモリ上に保存
             tempSessionList = GetSessionList(CommonServerSettings.ConnectionString);
+
+            MakeBlockingTreeList();
 
         }
 
@@ -239,45 +242,43 @@ namespace DBKeeper
             getSessionSQL = "with parent_ids as ( ";
             getSessionSQL += "select blocking_session_id ";
             getSessionSQL += "     , session_id ";
+            getSessionSQL += "	 , wait_duration_ms ";
             getSessionSQL += "  from sys.dm_os_waiting_tasks ";
             getSessionSQL += " where session_id > 50 ";
             getSessionSQL += "   and blocking_session_id is not null ";
-            getSessionSQL += "   and blocking_session_id <> session_id ";
             getSessionSQL += "), no2_levels as ( ";
-            getSessionSQL += "select a.blocking_session_id ";
-            getSessionSQL += "     , a.session_id as no2level_id ";
-            getSessionSQL += "     , b.session_id as no3level_id ";
-            getSessionSQL += "  from parent_ids a ";
-            getSessionSQL += "  left join sys.dm_os_waiting_tasks b ";
-            getSessionSQL += "    on b.blocking_session_id = a.session_id ";
-            getSessionSQL += " where b.blocking_session_id <> b.session_id ";
+            getSessionSQL += "select blocking_session_id ";
+            getSessionSQL += "     , session_id ";
+            getSessionSQL += "  from sys.dm_os_waiting_tasks ";
+            getSessionSQL += " where session_id > 50 ";
+            getSessionSQL += "   and blocking_session_id is not null ";
             getSessionSQL += "), no3_levels as ( ";
-            getSessionSQL += "select a.blocking_session_id ";
-            getSessionSQL += "     , a.no2level_id ";
-            getSessionSQL += "	 , a.no3level_id ";
-            getSessionSQL += "	 , b.session_id as no4level_id ";
-            getSessionSQL += "  from no2_levels a ";
-            getSessionSQL += "  left join parent_ids b ";
-            getSessionSQL += "    on b.blocking_session_id = a.no3level_id ";
+            getSessionSQL += "select blocking_session_id ";
+            getSessionSQL += "     , session_id ";
+            getSessionSQL += "  from sys.dm_os_waiting_tasks ";
+            getSessionSQL += " where session_id > 50 ";
+            getSessionSQL += "   and blocking_session_id is not null ";
             getSessionSQL += "), no4_levels as ( ";
-            getSessionSQL += "select a.blocking_session_id ";
-            getSessionSQL += "     , a.no2level_id ";
-            getSessionSQL += "	 , a.no3level_id ";
-            getSessionSQL += "	 , a.no4level_id ";
-            getSessionSQL += "	 , b.session_id as no5level_id ";
-            getSessionSQL += "  from no3_levels a ";
-            getSessionSQL += "  left join parent_ids b ";
-            getSessionSQL += "    on b.blocking_session_id = a.no4level_id ";
+            getSessionSQL += "select blocking_session_id ";
+            getSessionSQL += "     , session_id ";
+            getSessionSQL += "  from sys.dm_os_waiting_tasks ";
+            getSessionSQL += " where session_id > 50 ";
+            getSessionSQL += "   and blocking_session_id is not null ";
             getSessionSQL += ") ";
-            getSessionSQL += " ";
-            getSessionSQL += "select a.* ";
-            getSessionSQL += "  from no4_levels a ";
-            getSessionSQL += " where exists ( ";
-            getSessionSQL += "	select b.blocking_session_id ";
-            getSessionSQL += "	  from sys.dm_os_waiting_tasks b ";
-            getSessionSQL += "	 where b.blocking_session_id = a.no2level_id ";
-            getSessionSQL += " ) ";
-            getSessionSQL += " order by a.blocking_session_id ";
+            getSessionSQL += "select no1.blocking_session_id as no1_session_id ";
+            getSessionSQL += "     , no1.session_id as no2_session_id ";
+            getSessionSQL += "	 , no2.session_id as no3_session_id ";
+            getSessionSQL += "	 , no3.session_id as no4_session_id ";
+            getSessionSQL += "	 , no4.session_id as no5_session_id ";
+            getSessionSQL += "  from parent_ids as no1 ";
+            getSessionSQL += "  left join no2_levels as no2 ";
+            getSessionSQL += "    on no1.session_id = no2.blocking_session_id ";
+            getSessionSQL += "  left join no3_levels as no3 ";
+            getSessionSQL += "    on no2.session_id = no3.blocking_session_id ";
+            getSessionSQL += "  left join no4_levels as no4 ";
+            getSessionSQL += "    on no3.session_id = no4.blocking_session_id ";
+            getSessionSQL += " order by no1.wait_duration_ms desc ";
+            getSessionSQL += "; ";
 
             // SQL実行
             tmpDataSet = dbAccess.GetDataSet(getSessionSQL, CommonServerSettings.ConnectionString, ref errorMessage);
@@ -290,6 +291,48 @@ namespace DBKeeper
             tmpDataTable = tmpDataSet.Tables[0];
 
             return tmpDataTable;
+        }
+
+        /// <summary>
+        /// SQL情報を取得する
+        /// </summary>
+        /// <param name="connectionString">接続文字列</param>
+        /// <param name="sessionId">セッションID</param>
+        /// <returns>SQLテキスト</returns>
+        private string GetSqlText(string connectionString, string sessionId)
+        {
+            DBAccess dbAccess = new DBAccess();                                                         // データベースアクセス用共通クラス
+            DataSet tmpDataSet = new DataSet();
+            DataTable tmpDataTable = new DataTable();
+
+            string getSessionSQL = "";
+            string errorMessage = "";
+            string returnValue = "";
+
+            // SQL設定
+            getSessionSQL += "select b.text as sql_text ";
+            getSessionSQL += "  from sys.dm_exec_requests a ";
+            getSessionSQL += " cross apply sys.dm_exec_sql_text( a.sql_handle ) b ";
+            getSessionSQL += " where a.session_id = " + sessionId + " ";
+            getSessionSQL += "union all ";
+            getSessionSQL += "select b.text as sql_text ";
+            getSessionSQL += "  from sys.dm_exec_connections a ";
+            getSessionSQL += " cross apply sys.dm_exec_sql_text( a.most_recent_sql_handle )b ";
+            getSessionSQL += " where a.session_id = " + sessionId + " ";
+
+            // SQL実行
+            tmpDataSet = dbAccess.GetDataSet(getSessionSQL, CommonServerSettings.ConnectionString, ref errorMessage);
+            if (errorMessage != "")
+            {
+                MessageBox.Show(errorMessage);
+                return returnValue;
+            }
+
+            tmpDataTable = tmpDataSet.Tables[0];
+
+            returnValue = tmpDataTable.Rows[0][0].ToString();
+
+            return returnValue;
         }
 
         /// <summary>
@@ -313,6 +356,11 @@ namespace DBKeeper
             // TreeViewの選択された項目
             TreeViewItem selectedItem = (TreeViewItem)TreeViewBlocking.SelectedItem;
 
+            if (selectedItem == null)
+            {
+                return;
+            }
+
             // 選択されているセッションIDを取得
             string sessionId = selectedItem.Header.ToString();
 
@@ -333,21 +381,123 @@ namespace DBKeeper
                     db_name = tempSessionList.Rows[i]["db_name"].ToString();
                     task_state = tempSessionList.Rows[i]["task_state"].ToString();
                     application_name = tempSessionList.Rows[i]["application_name"].ToString();
-                    sql_command = tempSessionList.Rows[i]["sql_command"].ToString();
+                    sql_command = GetSqlText(CommonServerSettings.ConnectionString, sessionId);
 
                     break;
                 }
             }
 
             session_Info = "セッションID:" + sessionId + "\n";
+            session_Info += "--------------------------------------------------------------" + "\n";
             session_Info += "ログインID:" + login_id + "\n";
+            session_Info += "--------------------------------------------------------------" + "\n";
             session_Info += "タスクの状態:" + task_state + "\n";
+            session_Info += "--------------------------------------------------------------" + "\n";
             session_Info += "プログラム名:" + application_name + "\n";
-            session_Info += "実行中のSQL:" + sql_command;
+            session_Info += "--------------------------------------------------------------" + "\n";
+            session_Info += "実行中のSQL:" + "\n";
+            session_Info += "--------------------------------------------------------------" + "\n"; 
+            session_Info += sql_command;
 
             SessionInfo.Text = session_Info;
 
             
+        }
+
+        /// <summary>
+        /// セッションの強制終了確認
+        /// </summary>
+        /// <param name="sessionId">セッションID</param>
+        private void ConfirmKillSession(string sessionId)
+        {
+            string confirmMessage = "セッションID: " + sessionId + " を強制終了します。よろしいですか？";
+
+            // 確認メッセージの表示
+            MessageBoxResult mResult = MessageBox.Show(confirmMessage, "確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (mResult == MessageBoxResult.Yes)
+            {
+                // セッションの強制終了処理呼び出し
+                KillSession(sessionId);
+
+                // TreeViewのクリア
+                TreeViewBlocking.BeginInit();
+                TreeViewBlocking.Items.Clear();
+                TreeViewBlocking.EndInit();
+
+                // セッションのリストをメモリ上に保存
+                tempSessionList = new DataTable();
+                tempSessionList = GetSessionList(CommonServerSettings.ConnectionString);
+
+                // TreeView再作成
+                MakeBlockingTreeList();
+
+                
+            }
+        }
+
+        /// <summary>
+        /// セッションの強制終了
+        /// </summary>
+        /// <param name="paramSessionId">セッションID</param>
+        private void KillSession(string paramSessionId)
+        {
+            DBAccess dbAccess = new DBAccess();                                 // データベースアクセス用共通クラス
+
+            string killCommand = "Kill " + paramSessionId + ";";               // コマンド用SQL
+            string errorMessage = "";
+
+            // 実行
+            errorMessage = dbAccess.ExecuteCommand(killCommand, CommonServerSettings.ConnectionString);
+
+            if (errorMessage != "")
+            {
+                MessageBox.Show(errorMessage, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                MessageBox.Show("セッションID[" + paramSessionId + "]の強制終了が完了しました", "お知らせ", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        /// <summary>
+        /// TreeView右クリックメニュー選択イベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+            // セッションID
+            string sessionId = "";
+
+            try
+            {
+                // 選択された項目
+                TreeViewItem selectedItem = (TreeViewItem)TreeViewBlocking.SelectedItem;
+
+                // セッションID
+                sessionId = selectedItem.Header.ToString();
+            }
+            catch
+            {
+                // 何もしない
+            }
+
+            // 未選択状態の場合は処理を終了する
+            if (sessionId == "")
+            {
+                return;
+            }
+
+            // 確認画面呼び出し
+            ConfirmKillSession(sessionId);
+        }
+
+        private void ViewSessionListButton_Click(object sender, RoutedEventArgs e)
+        {
+            SessionList blockingList = new SessionList(WINDOW_NO);
+
+            blockingList.Show();
         }
     }
 }

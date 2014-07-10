@@ -215,6 +215,7 @@ namespace DBKeeper
                 m_table_session_list.Rows.Add(newRow);
             }
 
+            /* 
             // セッションリスト間ループ
             for (i = 0; i < m_table_session_list.Rows.Count; i++)
             {
@@ -231,6 +232,7 @@ namespace DBKeeper
                     }
                 }
             }
+             * */
         }
 
         /// <summary>
