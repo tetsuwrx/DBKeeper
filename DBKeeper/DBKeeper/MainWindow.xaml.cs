@@ -286,7 +286,6 @@ namespace DBKeeper
             double memoryUseage = 0;                    // メモリ使用率
             double diskIoBusy = 0;                      // ディスクへの物理アクセスカウント
             int blockingCount = 0;                      // ブロッキングセッション数
-            int blockingTime = 0;                       // ブロッキングセッションの待機時間(秒)
 
             DateTime nowTime;                           // 現在時刻
             DateTime beforeExecTime;                    // 前回実行時刻
@@ -302,13 +301,6 @@ namespace DBKeeper
             bool isChecked = false;                     // チェックしたかどうか
             
             System.Diagnostics.Debug.WriteLine("Server01Monitoring Start:" + DateTime.Now.ToString());
-
-            /*
-            if (monitor01Running == false)
-            {
-                return;
-            }
-             * */
 
             // ================================================================
             nowTime = DateTime.Now;
@@ -331,10 +323,6 @@ namespace DBKeeper
                     CpuHistory01.PercentageValue = cpuUseage;
 
                     isChecked = true;
-
-                    monitor01Running = true;
-
-                    StopWarning("01");
                 }
             }
             catch(Exception ex)
@@ -347,16 +335,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor01Running == true)
-                {
-                    monitor01Running = false;
-
-                    WarningAnimation("01");
-                }
-
-                return;
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -369,10 +348,6 @@ namespace DBKeeper
                     BufferCacheHitRate01.MeterValue = bufferCacheHitRate;
 
                     isChecked = true;
-
-                    monitor01Running = true;
-
-                    StopWarning("01");
                 }
             }
             catch (Exception ex)
@@ -385,14 +360,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor01Running == true)
-                {
-                    monitor01Running = false;
-
-                    WarningAnimation("01");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -405,10 +373,6 @@ namespace DBKeeper
                     ProcedureCacheHitRate01.MeterValue = procedureCacheHitRate;
 
                     isChecked = true;
-
-                    monitor01Running = true;
-
-                    StopWarning("01");
                 }
             }
             catch (Exception ex)
@@ -421,14 +385,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor01Running == true)
-                {
-                    monitor01Running = false;
-
-                    WarningAnimation("01");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -442,10 +399,6 @@ namespace DBKeeper
                     MemoryMeter01.MeterValueText = memoryText;
 
                     isChecked = true;
-
-                    monitor01Running = true;
-
-                    StopWarning("01");
                 }
             }
             catch (Exception ex)
@@ -458,14 +411,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor01Running == true)
-                {
-                    monitor01Running = false;
-
-                    WarningAnimation("01");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -477,10 +423,6 @@ namespace DBKeeper
                     Disk_I_O_Meter01.MeterValue = (int)diskIoBusy;
 
                     isChecked = true;
-
-                    monitor01Running = true;
-
-                    StopWarning("01");
                 }
             }
             catch (Exception ex)
@@ -493,14 +435,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor01Running == true)
-                {
-                    monitor01Running = false;
-
-                    WarningAnimation("01");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -510,11 +445,8 @@ namespace DBKeeper
                     string loginInfo = "";                   // ログイン情報
 
                     // ブロッキング数の取得
-                    // blockingCount = dbAccess.GetBlockingCount(CommonServer01Settings.ConnectionString, ref currentBlockingSidList01, ref loginInfo);
-                    // blockingCount = dbAccess.GetBlockingCount(CommonServer01Settings.ConnectionString, ref loginInfo);
-                    int ret = dbAccess.GetTopBlockingInfo(CommonServer01Settings.ConnectionString, ref loginInfo, ref blockingTime);
+                    blockingCount = dbAccess.GetBlockingCount(CommonServer01Settings.ConnectionString, ref currentBlockingSidList01, ref loginInfo);
 
-                    /*
                     bool isHited = false;                       // ヒットしたかどうか
 
                     for (int i = 0; i < currentBlockingSidList01.Count; i++)
@@ -582,20 +514,14 @@ namespace DBKeeper
                             maxBlockingCount = (int)chkBlockingSidList01[key];
                         }
                     }
-                    */
 
                     // ブロッキング検出回数により警告色へ移行
-                    // BlockingAlert01.CheckBlockingAlert(maxBlockingCount);
-                    BlockingAlert01.CheckBlockingAlert(blockingTime);
+                    BlockingAlert01.CheckBlockingAlert(maxBlockingCount);
 
                     // ログイン情報を表示
                     BlockingInfo01.Text = loginInfo;
 
                     isChecked = true;
-
-                    monitor01Running = true;
-
-                    StopWarning("01");
                 }
             }
             catch (Exception ex)
@@ -608,14 +534,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor01Running == true)
-                {
-                    monitor01Running = false;
-
-                    WarningAnimation("01");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             // 待機中のタスク数をカウント
@@ -644,14 +563,7 @@ namespace DBKeeper
                     errorMsg += "エラー詳細:" + "\n";
                     errorMsg += "　" + ex.Message;
 
-                    // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                    if (monitor01Running == true)
-                    {
-                        monitor01Running = false;
-
-                        WarningAnimation("01");
-                    }
+                    MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -675,7 +587,6 @@ namespace DBKeeper
             double memoryUseage = 0;                    // メモリ使用率
             double diskIoBusy = 0;                      // ディスクへの物理アクセスカウント
             int blockingCount = 0;                      // ブロッキングセッション数
-            int blockingTime = 0;                       // ブロッキングセッションの待機時間
 
             DateTime nowTime;                           // 現在時刻
             DateTime beforeExecTime;                    // 前回実行時刻
@@ -711,10 +622,6 @@ namespace DBKeeper
                     CpuHistory02.PercentageValue = cpuUseage;
 
                     isChecked = true;
-
-                    monitor02Running = true;
-
-                    StopWarning("02");
                 }
             }
             catch (Exception ex)
@@ -727,14 +634,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor02Running == true)
-                {
-                    monitor02Running = false;
-
-                    WarningAnimation("02");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -747,8 +647,6 @@ namespace DBKeeper
                     BufferCacheHitRate02.MeterValue = bufferCacheHitRate;
 
                     isChecked = true;
-
-                    monitor02Running = true;
                 }
             }
             catch (Exception ex)
@@ -761,14 +659,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor02Running == true)
-                {
-                    monitor02Running = false;
-
-                    WarningAnimation("02");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -781,8 +672,6 @@ namespace DBKeeper
                     ProcedureCacheHitRate02.MeterValue = procedureCacheHitRate;
 
                     isChecked = true;
-
-                    monitor02Running = true;
                 }
             }
             catch (Exception ex)
@@ -795,14 +684,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor02Running == true)
-                {
-                    monitor02Running = false;
-
-                    WarningAnimation("02");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -816,10 +698,6 @@ namespace DBKeeper
                     MemoryMeter02.MeterValueText = memoryText;
 
                     isChecked = true;
-
-                    monitor02Running = true;
-
-                    StopWarning("02");
                 }
             }
             catch (Exception ex)
@@ -832,14 +710,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor02Running == true)
-                {
-                    monitor02Running = false;
-
-                    WarningAnimation("02");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -851,8 +722,6 @@ namespace DBKeeper
                     Disk_I_O_Meter02.MeterValue = (int)diskIoBusy;
 
                     isChecked = true;
-
-                    monitor02Running = true;
                 }
             }
             catch (Exception ex)
@@ -865,14 +734,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor02Running == true)
-                {
-                    monitor02Running = false;
-
-                    WarningAnimation("02");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -882,11 +744,8 @@ namespace DBKeeper
                     string loginInfo = "";                      // ログイン情報
 
                     // ブロッキング数の取得
-                    // blockingCount = dbAccess.GetBlockingCount(CommonServer02Settings.ConnectionString, ref currentBlockingSidList02, ref loginInfo);
-                    // blockingCount = dbAccess.GetBlockingCount(CommonServer02Settings.ConnectionString, ref loginInfo);
-                    int ret = dbAccess.GetTopBlockingInfo(CommonServer02Settings.ConnectionString, ref loginInfo, ref blockingTime);
+                    blockingCount = dbAccess.GetBlockingCount(CommonServer02Settings.ConnectionString, ref currentBlockingSidList02, ref loginInfo);
 
-                    /*
                     bool isHited = false;                       // ヒットしたかどうか
 
                     for (int i = 0; i < currentBlockingSidList02.Count; i++)
@@ -952,19 +811,14 @@ namespace DBKeeper
                             maxBlockingCount = (int)chkBlockingSidList02[key];
                         }
                     }
-                     * */
 
                     // ブロッキング検出回数により警告色へ移行
-                    // BlockingAlert02.CheckBlockingAlert(maxBlockingCount);
-                    // BlockingAlert02.CheckBlockingAlert(blockingCount);
-                    BlockingAlert02.CheckBlockingAlert(blockingTime);
+                    BlockingAlert02.CheckBlockingAlert(maxBlockingCount);
 
                     // ログイン情報の表示
                     BlockingInfo02.Text = loginInfo;
 
                     isChecked = true;
-
-                    monitor02Running = true;
                 }
             }
             catch (Exception ex)
@@ -977,14 +831,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor02Running == true)
-                {
-                    monitor02Running = false;
-
-                    WarningAnimation("02");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             // 待機中のタスク数をカウント
@@ -1013,14 +860,7 @@ namespace DBKeeper
                     errorMsg += "エラー詳細:" + "\n";
                     errorMsg += "　" + ex.Message;
 
-                    // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                    if (monitor02Running == true)
-                    {
-                        monitor02Running = false;
-
-                        WarningAnimation("02");
-                    }
+                    MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -1043,7 +883,6 @@ namespace DBKeeper
             double memoryUseage = 0;                    // メモリ使用率
             double diskIoBusy = 0;                      // ディスクへの物理アクセスカウント
             int blockingCount = 0;                      // ブロッキングセッション数
-            int blockingTime = 0;                       // ブロッキングセッションの待機時間
 
             DateTime nowTime;                           // 現在時刻
             DateTime beforeExecTime;                    // 前回実行時刻
@@ -1079,10 +918,6 @@ namespace DBKeeper
                     CpuHistory03.PercentageValue = cpuUseage;
 
                     isChecked = true;
-
-                    monitor03Running = true;
-
-                    StopWarning("03");
                 }
             }
             catch (Exception ex)
@@ -1095,14 +930,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor03Running == true)
-                {
-                    monitor03Running = false;
-
-                    WarningAnimation("03");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1115,10 +943,6 @@ namespace DBKeeper
                     BufferCacheHitRate03.MeterValue = bufferCacheHitRate;
 
                     isChecked = true;
-
-                    monitor03Running = true;
-
-                    StopWarning("03");
                 }
             }
             catch (Exception ex)
@@ -1131,14 +955,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor03Running == true)
-                {
-                    monitor03Running = false;
-
-                    WarningAnimation("03");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1151,10 +968,6 @@ namespace DBKeeper
                     ProcedureCacheHitRate03.MeterValue = procedureCacheHitRate;
 
                     isChecked = true;
-
-                    monitor03Running = true;
-
-                    StopWarning("03");
                 }
             }
             catch (Exception ex)
@@ -1167,14 +980,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor03Running == true)
-                {
-                    monitor03Running = false;
-
-                    WarningAnimation("03");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1188,10 +994,6 @@ namespace DBKeeper
                     MemoryMeter03.MeterValueText = memoryText;
 
                     isChecked = true;
-
-                    monitor03Running = true;
-
-                    StopWarning("03");
                 }
             }
             catch (Exception ex)
@@ -1204,14 +1006,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor03Running == true)
-                {
-                    monitor03Running = false;
-
-                    WarningAnimation("03");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1223,10 +1018,6 @@ namespace DBKeeper
                     Disk_I_O_Meter03.MeterValue = (int)diskIoBusy;
 
                     isChecked = true;
-
-                    monitor03Running = true;
-
-                    StopWarning("03");
                 }
             }
             catch (Exception ex)
@@ -1239,14 +1030,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor03Running == true)
-                {
-                    monitor03Running = false;
-
-                    WarningAnimation("03");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1256,11 +1040,8 @@ namespace DBKeeper
                     string loginInfo = "";                      // ログイン情報
 
                     // ブロッキング数の取得
-                    // blockingCount = dbAccess.GetBlockingCount(CommonServer03Settings.ConnectionString, ref currentBlockingSidList03, ref loginInfo);
-                    // blockingCount = dbAccess.GetBlockingCount(CommonServer03Settings.ConnectionString, ref loginInfo);
-                    int ret = dbAccess.GetTopBlockingInfo(CommonServer03Settings.ConnectionString, ref loginInfo, ref blockingTime);
+                    blockingCount = dbAccess.GetBlockingCount(CommonServer03Settings.ConnectionString, ref currentBlockingSidList03, ref loginInfo);
 
-                    /*
                     bool isHited = false;                       // ヒットしたかどうか
 
                     for (int i = 0; i < currentBlockingSidList03.Count; i++)
@@ -1326,21 +1107,14 @@ namespace DBKeeper
                             maxBlockingCount = (int)chkBlockingSidList03[key];
                         }
                     }
-                     * */
 
                     // ブロッキング検出回数により警告色へ移行
-                    // BlockingAlert03.CheckBlockingAlert(maxBlockingCount);
-                    // BlockingAlert03.CheckBlockingAlert(blockingCount);
-                    BlockingAlert03.CheckBlockingAlert(blockingTime);
+                    BlockingAlert03.CheckBlockingAlert(maxBlockingCount);
 
                     // ログイン情報の表示
                     BlockingInfo03.Text = loginInfo;
 
                     isChecked = true;
-
-                    monitor03Running = true;
-
-                    StopWarning("03");
                 }
             }
             catch (Exception ex)
@@ -1353,14 +1127,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor03Running == true)
-                {
-                    monitor03Running = false;
-
-                    WarningAnimation("03");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             if (isChecked == true)
@@ -1394,14 +1161,7 @@ namespace DBKeeper
                     errorMsg += "エラー詳細:" + "\n";
                     errorMsg += "　" + ex.Message;
 
-                    // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                    if (monitor03Running == true)
-                    {
-                        monitor03Running = false;
-
-                        WarningAnimation("03");
-                    }
+                    MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -1419,7 +1179,6 @@ namespace DBKeeper
             double memoryUseage = 0;                    // メモリ使用率
             double diskIoBusy = 0;                      // ディスクへの物理アクセスカウント
             int blockingCount = 0;                      // ブロッキングセッション数
-            int blockingTime = 0;                       // 
 
             DateTime nowTime;                           // 現在時刻
             DateTime beforeExecTime;                    // 前回実行時刻
@@ -1455,10 +1214,6 @@ namespace DBKeeper
                     CpuHistory04.PercentageValue = cpuUseage;
 
                     isChecked = true;
-
-                    monitor04Running = true;
-
-                    StopWarning("04");
                 }
             }
             catch (Exception ex)
@@ -1471,14 +1226,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor04Running == true)
-                {
-                    monitor04Running = false;
-
-                    WarningAnimation("04");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1491,10 +1239,6 @@ namespace DBKeeper
                     BufferCacheHitRate04.MeterValue = bufferCacheHitRate;
 
                     isChecked = true;
-
-                    monitor04Running = true;
-
-                    StopWarning("04");
                 }
             }
             catch (Exception ex)
@@ -1507,14 +1251,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor04Running == true)
-                {
-                    monitor04Running = false;
-
-                    WarningAnimation("04");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1527,10 +1264,6 @@ namespace DBKeeper
                     ProcedureCacheHitRate04.MeterValue = procedureCacheHitRate;
 
                     isChecked = true;
-
-                    monitor04Running = true;
-
-                    StopWarning("04");
                 }
             }
             catch (Exception ex)
@@ -1543,14 +1276,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor04Running == true)
-                {
-                    monitor04Running = false;
-
-                    WarningAnimation("04");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1564,10 +1290,6 @@ namespace DBKeeper
                     MemoryMeter04.MeterValueText = memoryText;
 
                     isChecked = true;
-
-                    monitor04Running = true;
-
-                    StopWarning("04");
                 }
             }
             catch (Exception ex)
@@ -1580,14 +1302,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor04Running == true)
-                {
-                    monitor04Running = false;
-
-                    WarningAnimation("04");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1599,10 +1314,6 @@ namespace DBKeeper
                     Disk_I_O_Meter04.MeterValue = (int)diskIoBusy;
 
                     isChecked = true;
-
-                    monitor04Running = true;
-
-                    StopWarning("04");
                 }
             }
             catch (Exception ex)
@@ -1615,14 +1326,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor04Running == true)
-                {
-                    monitor04Running = false;
-
-                    WarningAnimation("04");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             try
@@ -1631,11 +1335,8 @@ namespace DBKeeper
                 {
                     string loginInfo = "";                  // ログイン情報
                     // ブロッキング数の取得
-                    // blockingCount = dbAccess.GetBlockingCount(CommonServer04Settings.ConnectionString, ref currentBlockingSidList04, ref loginInfo);
-                    // blockingCount = dbAccess.GetBlockingCount(CommonServer04Settings.ConnectionString,ref loginInfo);
-                    int ret = dbAccess.GetTopBlockingInfo(CommonServer04Settings.ConnectionString, ref loginInfo, ref blockingTime);
+                    blockingCount = dbAccess.GetBlockingCount(CommonServer04Settings.ConnectionString, ref currentBlockingSidList04, ref loginInfo);
 
-                    /*
                     bool isHited = false;                       // ヒットしたかどうか
 
                     for (int i = 0; i < currentBlockingSidList04.Count; i++)
@@ -1703,21 +1404,14 @@ namespace DBKeeper
                             maxBlockingCount = (int)chkBlockingSidList04[key];
                         }
                     }
-                     * */
 
                     // ブロッキング検出回数により警告色へ移行
-                    // BlockingAlert04.CheckBlockingAlert(maxBlockingCount);
-                    // BlockingAlert04.CheckBlockingAlert(blockingCount);
-                    BlockingAlert04.CheckBlockingAlert(blockingTime);
+                    BlockingAlert04.CheckBlockingAlert(maxBlockingCount);
 
                     // ログイン情報の表示
                     BlockingInfo04.Text = loginInfo;
 
                     isChecked = true;
-
-                    monitor04Running = true;
-
-                    StopWarning("04");
                 }
             }
             catch (Exception ex)
@@ -1730,14 +1424,7 @@ namespace DBKeeper
                 errorMsg += "エラー詳細:" + "\n";
                 errorMsg += "　" + ex.Message;
 
-                // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                if (monitor04Running == true)
-                {
-                    monitor04Running = false;
-
-                    WarningAnimation("04");
-                }
+                MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             // 待機中のタスク数をカウント
@@ -1765,14 +1452,7 @@ namespace DBKeeper
                     errorMsg += "エラー詳細:" + "\n";
                     errorMsg += "　" + ex.Message;
 
-                    // MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                    if (monitor04Running == true)
-                    {
-                        monitor04Running = false;
-
-                        WarningAnimation("04");
-                    }
+                    MessageBox.Show(errorMsg, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -1916,88 +1596,22 @@ namespace DBKeeper
         {
             OpenQueryMonitor(CommonServer04Settings.MonitoringStatus, "04");
         }
-
-        /// <summary>
-        /// 警告画像をアニメーションしながら表示
-        /// </summary>
-        /// <param name="targetServer">対象のサーバー</param>
-        private void WarningAnimation(string targetServer)
+        
+        /*
+        private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var startStoryBoard = new Storyboard();
-            {
-                var animation = new DoubleAnimation
-                {
-                    From = 0.0,
-                    To = 1.0,
-                    Duration = TimeSpan.FromMilliseconds(1500)
-                };
-                Storyboard.SetTargetProperty(animation, new PropertyPath("Opacity"));
-                startStoryBoard.Children.Add(animation);
-            }
+            DoubleAnimation animation01 = new DoubleAnimation();
+            animation01.From = 80;
+            animation01.To = 0;
+            animation01.Duration = new Duration(TimeSpan.FromMilliseconds(1500));
+            Storyboard.SetTargetProperty(animation01, new PropertyPath("(Canvas.Left)"));
+            Storyboard.SetTarget(animation01, this.BlockingInfo01);
+            var storyBoard = new Storyboard();
+            storyBoard.FillBehavior = FillBehavior.HoldEnd;
+            storyBoard.Children.Add(animation01);
 
-            var endStoryBoard = new Storyboard();
-            {
-                var animation = new DoubleAnimation
-                {
-                    From = 1.0,
-                    
-                    To = 0.0,
-                    Duration = TimeSpan.FromMilliseconds(3000)
-                };
-                Storyboard.SetTargetProperty(animation, new PropertyPath("Opacity"));
-                endStoryBoard.Children.Add(animation);
-            }
-
-            switch (targetServer)
-            {
-                case "01":
-                    Server1FrameWarning.Visibility = System.Windows.Visibility.Visible;
-                    Server1FrameWarning.Opacity = 0.1;
-                    Server1FrameWarning.BeginStoryboard(startStoryBoard);
-                    break;
-                case "02":
-                    Server2FrameWarning.Visibility = System.Windows.Visibility.Visible;
-                    Server2FrameWarning.Opacity = 0.1;
-                    Server2FrameWarning.BeginStoryboard(startStoryBoard);
-                    break;
-                case "03":
-                    Server3FrameWarning.Visibility = System.Windows.Visibility.Visible;
-                    Server3FrameWarning.Opacity = 0.1;
-                    Server3FrameWarning.BeginStoryboard(startStoryBoard);
-                    break;
-                case "04":
-                    Server4FrameWarning.Visibility = System.Windows.Visibility.Visible;
-                    Server4FrameWarning.Opacity = 0.1;
-                    Server4FrameWarning.BeginStoryboard(startStoryBoard);
-                    break;
-                default:
-                    break;
-            }
+            storyBoard.Begin();
         }
-
-        /// <summary>
-        /// 警告アニメーションを止める
-        /// </summary>
-        /// <param name="targetSever">対象となるサーバー番号</param>
-        private void StopWarning(string targetSever)
-        {
-            switch (targetSever)
-            {
-                case "01":
-                    Server1FrameWarning.Visibility = System.Windows.Visibility.Hidden;
-                    break;
-                case "02":
-                    Server2FrameWarning.Visibility = System.Windows.Visibility.Hidden;
-                    break;
-                case "03":
-                    Server3FrameWarning.Visibility = System.Windows.Visibility.Hidden;
-                    break;
-                case "04":
-                    Server4FrameWarning.Visibility = System.Windows.Visibility.Hidden;
-                    break;
-                default:
-                    break;
-            }
-        }
+         * */
     }
 }

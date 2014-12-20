@@ -2,78 +2,148 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SQL Serverデータベース監視ツール ～DBKeeper～ - セッションリスト" Height="800" Width="1200" Loaded="onLoaded" WindowStartupLocation="CenterOwner" Icon="Resources/DBkeeper.ico">
-    <Window.Resources>
-        <ContextMenu x:Key="menuOperation">
-            <MenuItem Header="詳細" Click="ViewSessionDetail_Click"/>
-            <MenuItem Header="強制終了" Click="SessionKill_Click"/>
-        </ContextMenu>
-    </Window.Resources>
     <Grid>
-        <ListView Name="BlockingListView" HorizontalAlignment="Left" ItemsSource="{Binding}"
-                  Height="680" VerticalAlignment="Top" Width="auto" Margin="10,10,10,10"
-                  ContextMenu="{DynamicResource menuOperation}" >
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
+        <DataGrid Name="BlockingListGrid" HorizontalAlignment="Left" AutoGenerateColumns="False" ItemsSource="{Binding}" Height="680" Margin="10,10,10,10" VerticalAlignment="Top" Width="auto" LoadingRow="BlockingListGrid_LoadingRow" >
+            <DataGrid.ItemContainerStyle>
+                <Style TargetType="DataGridRow">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding isblocked}" Value="True">
                             <Setter Property="Background" Value="LightPink" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding session_id}">
-                        <GridViewColumnHeader Content="セッションID" Tag="session_id" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding is_user_process}">
-                        <GridViewColumnHeader Content="ユーザープロセス" Tag="is_user_process" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding login_id}">
-                        <GridViewColumnHeader Content="ログインID" Tag="login_id" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding db_name}">
-                        <GridViewColumnHeader Content="データベース" Tag="db_name" Click="GridViewColumnHeader_Click"  />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding task_state}">
-                        <GridViewColumnHeader Content="タスクの状態" Tag="task_state" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding sql_command}">
-                        <GridViewColumnHeader Content="コマンド" Tag="sql_command" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding application_name}">
-                        <GridViewColumnHeader Content="アプリケーション" Tag="application_name" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding wait_time_ms}">
-                        <GridViewColumnHeader Content="待機時間(ミリ秒)" Tag="wait_time_ms" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding wait_type}">
-                        <GridViewColumnHeader Content="待機の種類" Tag="wait_type" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding wait_resource}">
-                        <GridViewColumnHeader Content="待機リソース" Tag="wait_resource" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding blocking_from}">
-                        <GridViewColumnHeader Content="ブロック元" Tag="blocking_from" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding top_block}">
-                        <GridViewColumnHeader Content="先頭ブロック" Tag="top_block" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding memory_usage}">
-                        <GridViewColumnHeader Content="メモリ使用量(KB)" Tag="memory_usage" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding host_name}">
-                        <GridViewColumnHeader Content="ホスト名" Tag="host_name" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding client_net_address}">
-                        <GridViewColumnHeader Content="IPアドレス" Tag="client_net_address" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding workload_group}">
-                        <GridViewColumnHeader Content="Workload Group" Tag="workload_group" Click="GridViewColumnHeader_Click" />
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+            </DataGrid.ItemContainerStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="セッションID"
+                    x:Name="col_session_id"
+                    Binding="{Binding session_id}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="ユーザープロセス"
+                    x:Name="col_is_userprocess"
+                    Binding="{Binding is_user_process}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="ログインID"
+                    x:Name="col_login_id"
+                    Binding="{Binding login_id}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="データベース"
+                    x:Name="col_db_name"
+                    Binding="{Binding db_name}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="タスクの状態"
+                    x:Name="col_task_state"
+                    Binding="{Binding task_state}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="コマンド"
+                    x:Name="col_sql_command"
+                    Binding="{Binding sql_command}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="アプリケーション"
+                    x:Name="col_application_name"
+                    Binding="{Binding application_name}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機時間(ミリ秒)"
+                    x:Name="col_wait_time_ms"
+                    Binding="{Binding wait_time_ms}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機の種類"
+                    x:Name="col_wait_type"
+                    Binding="{Binding wait_type}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機リソース"
+                    x:Name="col_wait_resource"
+                    Binding="{Binding wait_resource}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="ブロック元"
+                    x:Name="col_blocking_from"
+                    Binding="{Binding blocking_from}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="先頭ブロック"
+                    x:Name="col_top_block"
+                    Binding="{Binding top_block}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="メモリ使用量(KB)"
+                    x:Name="col_memory_usage"
+                    Binding="{Binding memory_usage}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="ホスト名"
+                    x:Name="col_host_name"
+                    Binding="{Binding host_name}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="IPアドレス"
+                    x:Name="col_client_net_address"
+                    Binding="{Binding client_net_address}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="Workload Group"
+                    x:Name="col_workload_group"
+                    Binding="{Binding workload_group}"
+                    IsReadOnly="True"
+                />
+            </DataGrid.Columns>
+        </DataGrid>
         <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Right" Height="28" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Click="CloseButton_Click"/>
         <Button x:Name="RefleshButton" Content="更新" HorizontalAlignment="Left" Height="28" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Click="RefleshButton_Click"/>
 

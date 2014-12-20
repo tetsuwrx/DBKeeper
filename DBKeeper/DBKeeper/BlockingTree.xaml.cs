@@ -189,7 +189,6 @@ namespace DBKeeper
             getSessionSQL += "     , isnull(s.host_name, '') as host_name";
             getSessionSQL += "     , isnull(c.client_net_address, '') as client_net_address";
             getSessionSQL += "     , isnull(g.name, '') as workload_group";
-            getSessionSQL += "     , st.text as sql_text";
             getSessionSQL += "  from sys.dm_exec_sessions s";
             getSessionSQL += "  left outer join sys.dm_exec_connections c";
             getSessionSQL += "    on s.session_id = c.session_id";
@@ -209,7 +208,6 @@ namespace DBKeeper
             getSessionSQL += "    on g.group_id = s.group_id";
             getSessionSQL += "  left outer join sys.sysprocesses p";
             getSessionSQL += "    on s.session_id = p.spid";
-            getSessionSQL += " cross apply sys.dm_exec_sql_text( c.most_recent_sql_handle ) st";
             getSessionSQL += " where s.session_id > 50";
             getSessionSQL += " order by s.session_id";
 
@@ -248,28 +246,24 @@ namespace DBKeeper
             getSessionSQL += "  from sys.dm_os_waiting_tasks ";
             getSessionSQL += " where session_id > 50 ";
             getSessionSQL += "   and blocking_session_id is not null ";
-            getSessionSQL += "   and blocking_session_id <> session_id ";
             getSessionSQL += "), no2_levels as ( ";
             getSessionSQL += "select blocking_session_id ";
             getSessionSQL += "     , session_id ";
             getSessionSQL += "  from sys.dm_os_waiting_tasks ";
             getSessionSQL += " where session_id > 50 ";
             getSessionSQL += "   and blocking_session_id is not null ";
-            getSessionSQL += "   and blocking_session_id <> session_id "; 
             getSessionSQL += "), no3_levels as ( ";
             getSessionSQL += "select blocking_session_id ";
             getSessionSQL += "     , session_id ";
             getSessionSQL += "  from sys.dm_os_waiting_tasks ";
             getSessionSQL += " where session_id > 50 ";
             getSessionSQL += "   and blocking_session_id is not null ";
-            getSessionSQL += "   and blocking_session_id <> session_id "; 
             getSessionSQL += "), no4_levels as ( ";
             getSessionSQL += "select blocking_session_id ";
             getSessionSQL += "     , session_id ";
             getSessionSQL += "  from sys.dm_os_waiting_tasks ";
             getSessionSQL += " where session_id > 50 ";
             getSessionSQL += "   and blocking_session_id is not null ";
-            getSessionSQL += "   and blocking_session_id <> session_id "; 
             getSessionSQL += ") ";
             getSessionSQL += "select no1.blocking_session_id as no1_session_id ";
             getSessionSQL += "     , no1.session_id as no2_session_id ";
@@ -387,8 +381,7 @@ namespace DBKeeper
                     db_name = tempSessionList.Rows[i]["db_name"].ToString();
                     task_state = tempSessionList.Rows[i]["task_state"].ToString();
                     application_name = tempSessionList.Rows[i]["application_name"].ToString();
-                    // sql_command = GetSqlText(CommonServerSettings.ConnectionString, sessionId);
-                    sql_command = tempSessionList.Rows[i]["sql_text"].ToString();
+                    sql_command = GetSqlText(CommonServerSettings.ConnectionString, sessionId);
 
                     break;
                 }

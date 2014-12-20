@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:MeterControl="clr-namespace:MeterControl;assembly=MeterControls" xmlns:MeterControls="clr-namespace:MeterControls;assembly=MeterControls" x:Name="MainScreen" x:Class="DBKeeper.MainWindow"
         Title="SQL Serverデータベース監視ツール ～DBKeeper～" Height="1000" Width="1280" WindowStartupLocation="CenterScreen" Loaded="onLoaded" Foreground="#FFF9F2F2" ResizeMode="CanMinimize" Icon="Resources/DBkeeper.ico">
+
     <Grid Margin="0,0,2,0" Height="994" VerticalAlignment="Bottom">
         <Button Content="Close" HorizontalAlignment="Left" Height="25" Margin="1163,965,0,0" VerticalAlignment="Top" Width="99" Click="Button_Click"/>
         <Rectangle Name="Server1Frame" HorizontalAlignment="Left" Height="450" Margin="8,54,0,0" VerticalAlignment="Top" Width="620" StrokeThickness="10" Stroke="Gray">
@@ -161,26 +162,6 @@
         <MeterControls:ChartControl x:Name="WaitHistory02" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1039,87,0,0" Width="195"/>
         <MeterControls:ChartControl x:Name="WaitHistory03" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="411,545,0,0" Height="85" Width="195"/>
         <MeterControls:ChartControl x:Name="WaitHistory04" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1039,545,0,0" Height="85" Width="195"/>
-        <Rectangle Name="Server1FrameWarning" HorizontalAlignment="Left" Height="450" Margin="8,54,0,0" VerticalAlignment="Top" Width="620" Visibility="Hidden">
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="Resources/warning.png"  TileMode="None" />
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Name="Server2FrameWarning" HorizontalAlignment="Left" Height="450" Margin="640,54,0,0" VerticalAlignment="Top" Width="620" Visibility="Hidden">
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="Resources/warning.png"  TileMode="None" />
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Name="Server3FrameWarning" HorizontalAlignment="Left" Height="450" Margin="8,510,0,0" VerticalAlignment="Top" Width="620" Visibility="Hidden">
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="Resources/warning.png"  TileMode="None" />
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Name="Server4FrameWarning" HorizontalAlignment="Left" Height="450" Margin="640,510,0,0" VerticalAlignment="Top" Width="620" Visibility="Hidden">
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="Resources/warning.png"  TileMode="None" />
-            </Rectangle.Fill>
-        </Rectangle>
 
 
     </Grid>
