@@ -13,6 +13,8 @@ using System.Windows.Shapes;
 using DBKeeper.Classes.Common;
 using System.Data;
 using System.Collections;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace DBKeeper
 {
@@ -65,7 +67,7 @@ namespace DBKeeper
 
             try
             {
-                InitTables();                   // テーブルの初期化
+                // InitTables();                   // テーブルの初期化
 
                 ViewSessionList();              // セッションリストの表示
             }
@@ -74,9 +76,6 @@ namespace DBKeeper
                 MessageBox.Show(ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-            // グリッドにバインド
-            BlockingListGrid.DataContext = m_table_session_list;
         }
 
         /// <summary>
@@ -103,7 +102,6 @@ namespace DBKeeper
             m_table_session_list.Columns.Add(new DataColumn("host_name", typeof(string)));              // ホスト名
             m_table_session_list.Columns.Add(new DataColumn("client_net_address", typeof(string)));              // ホスト名
             m_table_session_list.Columns.Add(new DataColumn("workload_group", typeof(string)));         // ワークロードグループ
-            m_table_session_list.Columns.Add(new DataColumn("isblocked", typeof(bool)));                // ブロックされているか
             
         }
 
@@ -134,7 +132,7 @@ namespace DBKeeper
             getSessionSQL += "     , isnull(w.wait_duration_ms, 0) as wait_time_ms";
             getSessionSQL += "     , isnull(w.wait_type, '') as wait_type";
             getSessionSQL += "     , isnull(w.resource_description, '') as wait_resource";
-            getSessionSQL += "     , isnull(convert (varchar, w.blocking_session_id), '') as blocking_from";
+            getSessionSQL += "     , isnull( convert(varchar, w.blocking_session_id), '') as blocking_from";
             getSessionSQL += "     , case when r2.session_id is not null and (r.blocking_session_id = 0 or r.session_id is null) then '1' else '' end as top_block";
             getSessionSQL += "     , s.memory_usage * 8192 / 1024 as memory_usage";
             getSessionSQL += "     , isnull(s.host_name, '') as host_name";
@@ -160,6 +158,7 @@ namespace DBKeeper
             getSessionSQL += "  left outer join sys.sysprocesses p";
             getSessionSQL += "    on s.session_id = p.spid";
             getSessionSQL += " where s.session_id > 50";
+            getSessionSQL += "   and isnull( convert(varchar, w.blocking_session_id), '') <> s.session_id";
             getSessionSQL += " order by s.session_id";
 
             // SQL実行
@@ -172,67 +171,41 @@ namespace DBKeeper
 
             tmpDataTable = tmpDataSet.Tables[0];
 
+            CollectionViewSource view = new CollectionViewSource();
+            ObservableCollection<SessionListRecord> sessionListRecord = new ObservableCollection<SessionListRecord>();
+
             // レコード間ループ
             for (i = 0; i < tmpDataTable.Rows.Count; i++)
             {
                 // 行を新規に生成
-                DataRow newRow = m_table_session_list.NewRow();
-
-                newRow["session_id"] = tmpDataTable.Rows[i]["session_id"];
-                newRow["is_user_process"] = tmpDataTable.Rows[i]["is_user_process"];
-                newRow["login_id"] = tmpDataTable.Rows[i]["login_id"];
-                newRow["db_name"] = tmpDataTable.Rows[i]["db_name"];
-                newRow["task_state"] = tmpDataTable.Rows[i]["task_state"];
-                newRow["sql_command"] = tmpDataTable.Rows[i]["sql_command"];
-                newRow["application_name"] = tmpDataTable.Rows[i]["application_name"];
-                newRow["wait_time_ms"] = tmpDataTable.Rows[i]["wait_time_ms"];
-                newRow["wait_type"] = tmpDataTable.Rows[i]["wait_type"];
-                newRow["wait_resource"] = tmpDataTable.Rows[i]["wait_resource"];
-                newRow["blocking_from"] = tmpDataTable.Rows[i]["blocking_from"];
-                newRow["top_block"] = tmpDataTable.Rows[i]["top_block"];
-                newRow["memory_usage"] = tmpDataTable.Rows[i]["memory_usage"];
-                newRow["host_name"] = tmpDataTable.Rows[i]["host_name"];
-                newRow["client_net_address"] = tmpDataTable.Rows[i]["client_net_address"];
-                newRow["workload_group"] = tmpDataTable.Rows[i]["workload_group"];
+                sessionListRecord.Add(new SessionListRecord()
+                {
+                    session_id = tmpDataTable.Rows[i]["session_id"].ToString(),
+                    is_user_process = tmpDataTable.Rows[i]["is_user_process"].ToString(),
+                    login_id = tmpDataTable.Rows[i]["login_id"].ToString(),
+                    db_name = tmpDataTable.Rows[i]["db_name"].ToString(),
+                    task_state = tmpDataTable.Rows[i]["task_state"].ToString(),
+                    sql_command = tmpDataTable.Rows[i]["sql_command"].ToString(),
+                    application_name = tmpDataTable.Rows[i]["application_name"].ToString(),
+                    wait_time_ms = tmpDataTable.Rows[i]["wait_time_ms"].ToString(),
+                    wait_type = tmpDataTable.Rows[i]["wait_type"].ToString(),
+                    wait_resource = tmpDataTable.Rows[i]["wait_resource"].ToString(),
+                    blocking_from = tmpDataTable.Rows[i]["blocking_from"].ToString(),
+                    top_block = tmpDataTable.Rows[i]["top_block"].ToString(),
+                    memory_usage = tmpDataTable.Rows[i]["memory_usage"].ToString(),
+                    host_name = tmpDataTable.Rows[i]["host_name"].ToString(),
+                    client_net_address = tmpDataTable.Rows[i]["client_net_address"].ToString(),
+                    workload_group = tmpDataTable.Rows[i]["workload_group"].ToString()
+                });
 
                 if ( tmpDataTable.Rows[i]["blocking_from"].ToString() != "" )
                 {
                     sessionIdList.Add(tmpDataTable.Rows[i]["blocking_from"].ToString());
                 }
-
-                /*
-                if (blockingSessionId > 0)
-                {
-                    newRow.SetField("isblocked", true);
-                }
-                else
-                {
-                    newRow.SetField("isblocked", false);
-                }
-                 * */
                 
-                // 新規の行をデータグリッドへ反映
-                m_table_session_list.Rows.Add(newRow);
+                view.Source = sessionListRecord;
+                BlockingListView.DataContext = view;
             }
-
-            /* 
-            // セッションリスト間ループ
-            for (i = 0; i < m_table_session_list.Rows.Count; i++)
-            {
-                for (int j = 0; j < sessionIdList.Count; j++)
-                {
-                    if (m_table_session_list.Rows[i]["session_id"].ToString() == sessionIdList[j].ToString())
-                    {
-                        m_table_session_list.Rows[i].SetField("isblocked", true);
-                        break;
-                    }
-                    else
-                    {
-                        m_table_session_list.Rows[i].SetField("isblocked", false);
-                    }
-                }
-            }
-             * */
         }
 
         /// <summary>
@@ -255,58 +228,24 @@ namespace DBKeeper
             
         }
 
-        private void Row_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            // MouseRightButtonUpが発生したRowを選択状態にする
-            var row = sender as DataGridRow;
-            BlockingListGrid.SelectedIndex = row.GetIndex();
-        }
-
-        /// <summary>
-        /// DataGrid行ロードイベント
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BlockingListGrid_LoadingRow(object sender, DataGridRowEventArgs e)
-        {
-            DataGridRow dataGridRow = e.Row;
-
-            // マウス右クリックでカーソルがある行を選択状態にする
-            e.Row.MouseRightButtonDown -= new MouseButtonEventHandler(Row_MouseRightButtonDown);
-            e.Row.MouseRightButtonDown += new MouseButtonEventHandler(Row_MouseRightButtonDown);
-
-            var dataContext = dataGridRow.Item as DataRowView;
-
-            if (dataContext == null)
-                return;
-
-            string sessionId = dataContext.Row[0].ToString();
-            
-            // 右クリックメニューの生成
-            ContextMenu cMenu = new ContextMenu();
-
-            // 「詳細」メニュー項目
-            MenuItem item = new MenuItem();
-            item.Header = "詳細";
-            item.Click += new System.Windows.RoutedEventHandler(delegate(object obj, System.Windows.RoutedEventArgs args) { OpenViewSessionDetailForm(sessionId); });
-            cMenu.Items.Add(item);
-
-            // 「強制終了」メニュー項目
-            MenuItem item2 = new MenuItem();
-            item2.Header = "強制終了";
-            item2.Click += new System.Windows.RoutedEventHandler(delegate(object obj, System.Windows.RoutedEventArgs args) { SessionKill(sessionId); });
-            cMenu.Items.Add(item2);
-
-            // コンテキストに設定
-            ContextMenuService.SetContextMenu(dataGridRow, cMenu);
-        }
-
         /// <summary>
         /// セッションの詳細画面呼び出し
         /// </summary>
-        /// <param name="sessionId">セッションID</param>
-        private void OpenViewSessionDetailForm(string sessionId)
+        private void OpenViewSessionDetailForm()
         {
+            string sessionId = "";
+
+            // 選択項目があるかどうかを確認する
+            if (BlockingListView.SelectedItems.Count == 0)
+            {
+                // 選択項目が無いので処理をせず抜ける
+                return;
+            }
+
+            SessionListRecord record = (SessionListRecord)BlockingListView.SelectedItems[0];
+
+            sessionId = record.session_id;
+
             SessionDetail sessionDetail = new SessionDetail(sessionId, CommonServerSettings);
 
             sessionDetail.Owner = this;
@@ -323,9 +262,21 @@ namespace DBKeeper
         /// <summary>
         /// セッションの強制終了
         /// </summary>
-        /// <param name="sessionId">セッションID</param>
-        private void SessionKill(string sessionId)
+        private void SessionKill()
         {
+            string sessionId = "";
+            
+            // 選択項目があるかどうかを確認する
+            if (BlockingListView.SelectedItems.Count == 0)
+            {
+                // 選択項目が無いので処理をせず抜ける
+                return;
+            }
+
+            SessionListRecord record = (SessionListRecord)BlockingListView.SelectedItems[0];
+
+            sessionId = record.session_id;
+
             string confirmMessage = "セッションID: " + sessionId + " を強制終了します。よろしいですか？";
 
             // 確認メッセージの表示
@@ -377,16 +328,105 @@ namespace DBKeeper
         /// </summary>
         private void RefleshWindow()
         {
-            // グリッドのクリア
-            m_table_session_list.Rows.Clear();
-            BlockingListGrid.DataContext = m_table_session_list;
-
             // セッションリストの再取得
             ViewSessionList();
-
-            // データコンテキストの反映
-            BlockingListGrid.DataContext = m_table_session_list;
         }
 
+        /// <summary>
+        /// 右クリックメニュー「詳細」クリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ViewSessionDetail_Click(object sender, RoutedEventArgs e)
+        {
+            OpenViewSessionDetailForm();
+        }
+
+        /// <summary>
+        /// 右クリックメニュー「強制終了」クリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SessionKill_Click(object sender, RoutedEventArgs e)
+        {
+            SessionKill();
+        }
+
+        /// <summary>
+        /// GridViewのタイトル列クリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GridViewColumnHeader_Click(object sender, RoutedEventArgs e)
+        {
+            // 列ヘッダーを取得
+            GridViewColumnHeader columnHeader = sender as GridViewColumnHeader;
+            // ヘッダーのタグ名を取得
+            string columnTagName = columnHeader.Tag.ToString();
+            // ListViewのソート実行
+            SortListView(BlockingListView, columnTagName, false);
+        }
+
+        /// <summary>
+        /// ListViewのソート
+        /// </summary>
+        /// <param name="listView">対象のListView</param>
+        /// <param name="headerTagName">ソートする列のタグ名</param>
+        /// <param name="IsMultiSort">True:複合列でのソート、False:単数列でのソート</param>
+        public void SortListView(ListView listView, string headerTagName, bool IsMultiSort)
+        {
+            // 対象のListViewが何もなければ処理終了
+            if (listView.Items == null && listView.Items.Count == 0)
+            {
+                return;
+            }
+
+            // SortDescriptionの取得
+            var r = listView.Items.SortDescriptions.Where(x => x.PropertyName == headerTagName);
+
+            ListSortDirection sort;
+
+            // 昇順・降順の設定
+            if (r.Count() == 0)
+            {
+                // 新規に降順として作成
+                sort = ListSortDirection.Descending;
+            }
+            else
+            {
+                // 既存のSortObjectがある場合は、前回実行結果と比較したうえで逆を設定
+                sort = ( r.First().Direction == ListSortDirection.Descending ) ? ListSortDirection.Ascending : ListSortDirection.Descending;
+                listView.Items.SortDescriptions.Remove(r.First());
+            }
+
+            // 複合列ソートの判断
+            if (IsMultiSort == false)
+            {
+                // ソート内容の詳細をクリア
+                listView.Items.SortDescriptions.Clear();
+            }
+
+            listView.Items.SortDescriptions.Add(new SortDescription(headerTagName, sort));
+        }
+    }
+
+    class SessionListRecord
+    {
+        public string session_id { get; set; }
+        public string is_user_process { get; set; }
+        public string login_id { get; set; }
+        public string db_name { get; set; }
+        public string task_state { get; set; }
+        public string sql_command { get; set; }
+        public string application_name { get; set; }
+        public string wait_time_ms { get; set; }
+        public string wait_type { get; set; }
+        public string wait_resource { get; set; }
+        public string blocking_from { get; set; }
+        public string top_block { get; set; }
+        public string memory_usage { get; set; }
+        public string host_name { get; set; }
+        public string client_net_address { get; set; }
+        public string workload_group { get; set; }
     }
 }

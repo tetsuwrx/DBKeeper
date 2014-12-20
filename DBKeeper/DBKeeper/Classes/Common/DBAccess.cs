@@ -48,6 +48,7 @@ namespace DBKeeper.Classes.Common
             catch (Exception e)
             {
                 RefErrorMessage = e.Message;
+                throw e;
             }
             finally
             {
@@ -451,7 +452,8 @@ namespace DBKeeper.Classes.Common
         /// <param name="refBlockingSidList">ブロッキングリスト</param>
         /// <param name="refLoginInfo">ログイン情報</param>
         /// <returns>ブロッキングセッション数</returns>
-        public int GetBlockingCount(string CurrentConnectionString, ref ArrayList refBlockingSidList, ref string refLoginInfo)
+        //public int GetBlockingCount(string CurrentConnectionString, ref ArrayList refBlockingSidList, ref string refLoginInfo)
+        public int GetBlockingCount(string CurrentConnectionString, ref string refLoginInfo)
         {
             int retValue = 0;                // 戻り値用
             string selectSQL = "";              // 取得用SQL
@@ -461,7 +463,7 @@ namespace DBKeeper.Classes.Common
 
             // string dataValue = "";              // DBから取得した値
 
-            ArrayList blockingList = new ArrayList();               // ブロッキングセッションIDのリスト
+            // ArrayList blockingList = new ArrayList();               // ブロッキングセッションIDのリスト
 
             /*
             selectSQL = "declare @BlockingInfo table (" + "\n";
@@ -509,13 +511,18 @@ namespace DBKeeper.Classes.Common
             selectSQL += ";";
              * */
 
-            selectSQL = "select a.blocking_session_id" + "\n";
-            selectSQL += "    , isnull(b.login_name,'') + ':' + isnull(b.host_name,'') as [login_info]" + "\n";
-            selectSQL += "  from sys.dm_os_waiting_tasks a" + "\n";
-            selectSQL += "  left join sys.dm_exec_sessions b" + "\n";
-            selectSQL += "    on a.blocking_session_id = b.session_id" + "\n";
-            selectSQL += " where a.blocking_session_id > 50" + "\n";
-            selectSQL += " order by b.total_elapsed_time desc";
+            selectSQL  = "select distinct blocking_session_id" + "\n";
+            selectSQL += "     , login_info" + "\n";
+            selectSQL += "  from (" + "\n";
+            selectSQL += "    select top 10000 a.blocking_session_id" + "\n";
+            selectSQL += "         , isnull(b.login_name,'') + ':' + isnull(b.host_name,'') as [login_info]" + "\n";
+            selectSQL += "      from sys.dm_os_waiting_tasks a" + "\n";
+            selectSQL += "      left join sys.dm_exec_sessions b" + "\n";
+            selectSQL += "        on a.blocking_session_id = b.session_id" + "\n";
+            selectSQL += "     where a.blocking_session_id > 50" + "\n";
+            selectSQL += "       and a.blocking_session_id <> a.session_id" + "\n";
+            selectSQL += "     order by b.total_elapsed_time desc";
+            selectSQL += "    ) a";
 
             dataSet = GetDataSet(selectSQL, CurrentConnectionString, ref errorMessage);
 
@@ -525,6 +532,7 @@ namespace DBKeeper.Classes.Common
                 {
                     dataTable = dataSet.Tables[0];
 
+                    /*
                     for (int i = 0; i < dataTable.Rows.Count; i++)
                     {
                         // ブロッキングセッションIDをArrayListに蓄積
@@ -536,6 +544,7 @@ namespace DBKeeper.Classes.Common
                             refLoginInfo = dataTable.Rows[i]["login_info"].ToString();
                         }
                     }
+                     * */
 
                     // dataValue = dataTable.Rows[0][0].ToString();
                     // retValue = int.Parse(dataValue);
@@ -547,7 +556,61 @@ namespace DBKeeper.Classes.Common
             dataTable.Dispose();
 
             // ブロッキングリストを渡す
-            refBlockingSidList = blockingList;
+            // refBlockingSidList = blockingList;
+
+            return retValue;
+        }
+
+        /// <summary>
+        /// 一番長くブロッキングしているセッションの情報を取得
+        /// </summary>
+        /// <param name="CurrentConnectionString">対象の接続文字列</param>
+        /// <param name="refBlockingSidList">ブロッキングリスト</param>
+        /// <param name="refLoginInfo">ログイン情報</param>
+        /// <param name="refWaitDurationTime">待機時間(秒)</param>
+        /// <returns>ブロッキングセッション数</returns>
+        public int GetTopBlockingInfo(string CurrentConnectionString, ref string refLoginInfo, ref int refWaitDurationTime)
+        {
+            int retValue = 0;                // 戻り値用
+            string selectSQL = "";              // 取得用SQL
+            string errorMessage = "";           // エラーメッセージ
+            DataSet dataSet = new DataSet();
+            DataTable dataTable = new DataTable();
+
+            selectSQL =  "select top 1 a.blocking_session_id" + "\n";
+            selectSQL += "     , isnull(b.login_name,'') + ':' + isnull(b.host_name,'') as [login_info]" + "\n";
+            selectSQL += "     , a.wait_duration_ms / 1000 as [wait_duration_time]" + "\n";
+            selectSQL += "  from sys.dm_os_waiting_tasks a" + "\n";
+            selectSQL += "  left join sys.dm_exec_sessions b" + "\n";
+            selectSQL += "    on a.blocking_session_id = b.session_id" + "\n";
+            selectSQL += " where a.blocking_session_id > 50" + "\n";
+            selectSQL += "   and a.blocking_session_id <> a.session_id" + "\n";
+            selectSQL += " order by a.wait_duration_ms desc";
+
+            dataSet = GetDataSet(selectSQL, CurrentConnectionString, ref errorMessage);
+
+            if (errorMessage == "")
+            {
+                if (dataSet.Tables.Count > 0)
+                {
+                    dataTable = dataSet.Tables[0];
+
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        // ログイン情報の取得
+                        refLoginInfo = dataTable.Rows[0]["login_info"].ToString();
+                        // 待機時間の取得
+                        int.TryParse(dataTable.Rows[0]["wait_duration_time"].ToString(), out refWaitDurationTime);
+                    }
+                }
+            }
+            else
+            {
+                retValue = -1;
+            }
+
+            dataSet.Dispose();
+            dataTable.Dispose();
 
             return retValue;
         }

@@ -13,6 +13,8 @@ using System.Windows.Shapes;
 using DBKeeper.Classes.Common;
 using System.Data;
 using System.Collections;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace DBKeeper
 {
@@ -27,9 +29,7 @@ namespace DBKeeper
 
         //public string targetServer;
 
-        //----------------------------------------------------------------------メンバ変数
-        private DataTable m_table_query_list;                   // 実行中のクエリのリスト
-        private DataTable m_table_high_cost_query_list;         // 読込I/Oコストの高いクエリのリスト
+        private ArrayList BuffDataFileIoList;
 
         /// <summary>
         /// 実行中のクエリ、読み込みI/Oコストの高いクエリをリストで表示
@@ -66,8 +66,6 @@ namespace DBKeeper
 
             try
             {
-                InitTables();                   // テーブルの初期化
-
                 ViewExecutingQueryList();              // セッションリストの表示
             }
             catch (Exception ex)
@@ -75,68 +73,36 @@ namespace DBKeeper
                 MessageBox.Show(ex.Message, Title, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-            // グリッドにバインド
-            ExecutingQueryList.DataContext = m_table_query_list;
-            LogicalReadHighCostQueryList.DataContext = m_table_high_cost_query_list;
         }
 
         /// <summary>
-        /// セッションリストDataGridの初期化
+        /// GridViewのタイトル列クリックイベント
         /// </summary>
-        private void InitTables()
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void QueryListViewColumnHeader_Click(object sender, RoutedEventArgs e)
         {
-            // 行列のサイズ指定
-            ExecutingQueryList.Columns[0].MinWidth = 80;
-            ExecutingQueryList.Columns[0].MaxWidth = 80;
-            ExecutingQueryList.Columns[1].MinWidth = 80;
-            ExecutingQueryList.Columns[1].MaxWidth = 80;
-            ExecutingQueryList.Columns[2].MinWidth = 80;
-            ExecutingQueryList.Columns[2].MaxWidth = 80;
-            ExecutingQueryList.Columns[3].MinWidth = 80;
-            ExecutingQueryList.Columns[3].MaxWidth = 80;
-            ExecutingQueryList.Columns[4].MinWidth = 80;
-            ExecutingQueryList.Columns[4].MaxWidth = 800;
-            ExecutingQueryList.RowHeight = 20;
+            // 列ヘッダーを取得
+            GridViewColumnHeader columnHeader = sender as GridViewColumnHeader;
+            // ヘッダーのタグ名を取得
+            string columnTagName = columnHeader.Tag.ToString();
+            // ListViewのソート実行
+            SortListView(ExecutingQueryListView, columnTagName, false);
+        }
 
-            LogicalReadHighCostQueryList.Columns[0].MinWidth = 800;
-            LogicalReadHighCostQueryList.Columns[0].MaxWidth = 800;
-            LogicalReadHighCostQueryList.Columns[1].MinWidth = 80;
-            LogicalReadHighCostQueryList.Columns[1].MaxWidth = 80;
-            LogicalReadHighCostQueryList.Columns[2].MinWidth = 80;
-            LogicalReadHighCostQueryList.Columns[2].MaxWidth = 80;
-            LogicalReadHighCostQueryList.Columns[3].MinWidth = 80;
-            LogicalReadHighCostQueryList.Columns[3].MaxWidth = 80;
-            LogicalReadHighCostQueryList.Columns[4].MinWidth = 80;
-            LogicalReadHighCostQueryList.Columns[4].MaxWidth = 80;
-            LogicalReadHighCostQueryList.Columns[5].MinWidth = 80;
-            LogicalReadHighCostQueryList.Columns[5].MaxWidth = 80;
-            LogicalReadHighCostQueryList.Columns[6].MinWidth = 80;
-            LogicalReadHighCostQueryList.Columns[6].MaxWidth = 80;
-            LogicalReadHighCostQueryList.Columns[7].MinWidth = 80;
-            LogicalReadHighCostQueryList.Columns[7].MaxWidth = 80;
-            LogicalReadHighCostQueryList.RowHeight = 20;
-
-            // クエリのリストのテーブル生成
-            m_table_query_list = new DataTable("query_list");
-            m_table_query_list.Columns.Add(new DataColumn("session_id", typeof(int)));                // セッションID
-            m_table_query_list.Columns.Add(new DataColumn("wait_type", typeof(string)));              // 待機種類
-            m_table_query_list.Columns.Add(new DataColumn("wait_time", typeof(long)));                // 待機時間
-            m_table_query_list.Columns.Add(new DataColumn("last_wait_type", typeof(string)));         // 最終待機種類
-            m_table_query_list.Columns.Add(new DataColumn("wait_resource", typeof(string)));          // 待機リソース
-            m_table_query_list.Columns.Add(new DataColumn("query_text", typeof(string)));             // 実行中のSQL
-
-            // クエリのリストのテーブル生成
-            m_table_high_cost_query_list = new DataTable("high_cost_i_o_list");
-            m_table_high_cost_query_list.Columns.Add(new DataColumn("query_text", typeof(string)));             // クエリ
-            m_table_high_cost_query_list.Columns.Add(new DataColumn("execution_count", typeof(long)));          // 実行回数
-            m_table_high_cost_query_list.Columns.Add(new DataColumn("total_logical_reads", typeof(long)));      // 合計読込回数
-            m_table_high_cost_query_list.Columns.Add(new DataColumn("last_logical_reads", typeof(long)));       // 最新読込回数
-            m_table_high_cost_query_list.Columns.Add(new DataColumn("total_elapsed_time", typeof(long)));       // 合計経過時間
-            m_table_high_cost_query_list.Columns.Add(new DataColumn("last_elapsed_time", typeof(long)));        // 最新経過時間
-            m_table_high_cost_query_list.Columns.Add(new DataColumn("last_execution_time", typeof(string)));    // 最終実行時刻
-            m_table_high_cost_query_list.Columns.Add(new DataColumn("query_plan", typeof(string)));             // 実行計画
-
+        /// <summary>
+        /// GridViewのタイトル列クリックイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DataFileListViewColumnHeader_Click(object sender, RoutedEventArgs e)
+        {
+            // 列ヘッダーを取得
+            GridViewColumnHeader columnHeader = sender as GridViewColumnHeader;
+            // ヘッダーのタグ名を取得
+            string columnTagName = columnHeader.Tag.ToString();
+            // ListViewのソート実行
+            SortListView(DataFileIOListView, columnTagName, false);
         }
 
         /// <summary>
@@ -170,31 +136,37 @@ namespace DBKeeper
                 MessageBox.Show(errorMessage);
                 return;
             }
-
+            
             tmpDataTable = tmpDataSet.Tables[0];
+
+            CollectionViewSource view = new CollectionViewSource();
+            ObservableCollection<QueryListRecord> queryListRecord = new ObservableCollection<QueryListRecord>();
+
 
             // レコード間ループ
             for (int i = 0; i < tmpDataTable.Rows.Count; i++)
             {
-                // 行を新規に生成
-                DataRow newRow = m_table_query_list.NewRow();
+                queryListRecord.Add(new QueryListRecord()
+                {
+                    session_id = tmpDataTable.Rows[i]["session_id"].ToString(),
+                    wait_type = tmpDataTable.Rows[i]["wait_type"].ToString(),
+                    wait_time = tmpDataTable.Rows[i]["wait_time"].ToString(),
+                    last_wait_type = tmpDataTable.Rows[i]["last_wait_type"].ToString(),
+                    wait_resource = tmpDataTable.Rows[i]["wait_resource"].ToString(),
+                    query_text = tmpDataTable.Rows[i]["query_text"].ToString()
 
-                newRow["session_id"] = tmpDataTable.Rows[i]["session_id"];
-                newRow["wait_type"] = tmpDataTable.Rows[i]["wait_type"];
-                newRow["wait_time"] = tmpDataTable.Rows[i]["wait_time"];
-                newRow["last_wait_type"] = tmpDataTable.Rows[i]["last_wait_type"];
-                newRow["wait_resource"] = tmpDataTable.Rows[i]["wait_resource"];
-                newRow["query_text"] = tmpDataTable.Rows[i]["query_text"];
+                });
                 
-                // 新規の行をデータグリッドへ反映
-                m_table_query_list.Rows.Add(newRow);
+                // 新規の行をListViewへ反映
+                view.Source = queryListRecord;
+                ExecutingQueryListView.DataContext = view;
             }
         }
 
         /// <summary>
-        /// 実行中のクエリと読み取りI/Oコストの高いクエリを取得し、DataGridへ反映する
+        /// データファイルのI/Oリストを取得
         /// </summary>
-        private void ViewDiskIoHighCostList()
+        private void ViewDataFileIOList()
         {
             DBAccess dbAccess = new DBAccess();                                                         // データベースアクセス用共通クラス
             DataSet tmpDataSet = new DataSet();
@@ -202,22 +174,22 @@ namespace DBKeeper
 
             string getQueryListSQL = "";
             string errorMessage = "";
-
+            
             // 読み取りI/Oコストが高いクエリを取得
-            getQueryListSQL = "select TOP 20 qt.text as query_text";
-            getQueryListSQL += "      , qs.execution_count ";
-            getQueryListSQL += "      , qs.total_logical_reads, qs.last_logical_reads ";
-            getQueryListSQL += "      , qs.min_logical_reads, qs.max_logical_reads ";
-            getQueryListSQL += "      , qs.total_elapsed_time, qs.last_elapsed_time ";
-            getQueryListSQL += "      , qs.min_elapsed_time, qs.max_elapsed_time ";
-            getQueryListSQL += "      , qs.last_execution_time ";
-            getQueryListSQL += "      , qp.query_plan ";
-            getQueryListSQL += "  FROM sys.dm_exec_query_stats qs ";
-            getQueryListSQL += " CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) qt ";
-            getQueryListSQL += " CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) qp ";
-            getQueryListSQL += " WHERE qt.encrypted=0 ";
-            getQueryListSQL += " ORDER BY qs.total_logical_reads DESC ";
-
+            getQueryListSQL = "declare @current_collection_time datetime;";
+            getQueryListSQL += "set @current_collection_time = GETDATE();";
+            getQueryListSQL += "select @current_collection_time as collection_time ";
+            getQueryListSQL += "      , d.name AS [Database] ";
+            getQueryListSQL += "      , f.physical_name as [File] ";
+            getQueryListSQL += "      , (fs.num_of_bytes_read / 1024.0 / 1024.0) as [Total_MB_Read] ";
+            getQueryListSQL += "      , (fs.num_of_bytes_written / 1024.0 / 1024.0) as [Total_MB_Written] ";
+            getQueryListSQL += "      , (fs.num_of_reads + fs.num_of_writes) as [Total_IO_Count] ";
+            getQueryListSQL += "      , fs.io_stall as [Total_IO_Wait_Time] ";
+            getQueryListSQL += "  from sys.dm_io_virtual_file_stats(default, default) as fs ";
+            getQueryListSQL += " inner join sys.master_files f on fs.database_id = f.database_id ";
+            getQueryListSQL += "   and fs.file_id = f.file_id ";
+            getQueryListSQL += " inner join sys.databases d on d.database_id = fs.database_id ";
+            
             // SQL実行
             tmpDataSet = dbAccess.GetDataSet(getQueryListSQL, CommonServerSettings.ConnectionString, ref errorMessage);
             if (errorMessage != "")
@@ -228,24 +200,33 @@ namespace DBKeeper
 
             tmpDataTable = tmpDataSet.Tables[0];
 
+            CollectionViewSource view = new CollectionViewSource();
+            ObservableCollection<DataFileIoListViewClass> datafileIoList = new ObservableCollection<DataFileIoListViewClass>();
+
             // レコード間ループ
             for (int i = 0; i < tmpDataTable.Rows.Count; i++)
             {
+                double tmp_total_read_mb = 0;
+                double tmp_total_write_mb = 0;
+                double tmp_total_io_wait_time = 0;
+
+                Double.TryParse(tmpDataTable.Rows[i]["Total_MB_Read"].ToString(),out tmp_total_read_mb);
+                Double.TryParse(tmpDataTable.Rows[i]["Total_MB_Written"].ToString(),out tmp_total_write_mb);
+                Double.TryParse(tmpDataTable.Rows[i]["Total_IO_Wait_Time"].ToString(),out tmp_total_io_wait_time);
+
                 // 行を新規に生成
-                DataRow newRow = m_table_high_cost_query_list.NewRow();
-
-                newRow["query_text"] = tmpDataTable.Rows[i]["query_text"];
-                newRow["execution_count"] = tmpDataTable.Rows[i]["execution_count"];
-                newRow["total_logical_reads"] = tmpDataTable.Rows[i]["total_logical_reads"];
-                newRow["last_logical_reads"] = tmpDataTable.Rows[i]["last_logical_reads"];
-                newRow["total_elapsed_time"] = tmpDataTable.Rows[i]["total_elapsed_time"];
-                newRow["last_elapsed_time"] = tmpDataTable.Rows[i]["last_elapsed_time"];
-                newRow["last_execution_time"] = tmpDataTable.Rows[i]["last_execution_time"];
-                newRow["query_plan"] = tmpDataTable.Rows[i]["query_plan"];
-
-                // 新規の行をデータグリッドへ反映
-                m_table_high_cost_query_list.Rows.Add(newRow);
+                datafileIoList.Add( new DataFileIoListViewClass()
+                {
+                    database_name = tmpDataTable.Rows[i]["Database"].ToString(),
+                    file_name = tmpDataTable.Rows[i]["File"].ToString(),
+                    total_read_mb = tmp_total_read_mb,
+                    total_write_mb = tmp_total_write_mb,
+                    total_io_wait_time = tmp_total_io_wait_time
+                });
             }
+
+            view.Source = datafileIoList;
+            DataFileIOListView.DataContext = view;
         }
 
         /// <summary>
@@ -255,10 +236,6 @@ namespace DBKeeper
         /// <param name="e"></param>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            // 各リストテーブルの内容をクリア
-            m_table_query_list.Dispose();
-            m_table_high_cost_query_list.Dispose();
-
             // 画面を閉じる
             Close();
         }
@@ -278,17 +255,9 @@ namespace DBKeeper
         /// </summary>
         private void RefreshWindow()
         {
-            // 各リストテーブルの内容をクリア
-            m_table_query_list.Clear();
-            m_table_high_cost_query_list.Clear();
-
             // データ取得＆グリッド反映
             ViewExecutingQueryList();
-            ViewDiskIoHighCostList();
-
-            // データコンテキストの設定
-            ExecutingQueryList.DataContext = m_table_query_list;
-            LogicalReadHighCostQueryList.DataContext = m_table_high_cost_query_list;
+            ViewDataFileIOList();
         }
 
         /// <summary>
@@ -317,8 +286,8 @@ namespace DBKeeper
         {
             string sessionId = "";                          // セッションID
             string queryText = "";                          // クエリテキスト
-
-            var dataContext = ExecutingQueryList.Items[ExecutingQueryList.SelectedIndex] as DataRowView;
+            ListView senderView = sender as ListView;
+            var dataContext = senderView.Items[senderView.SelectedIndex] as DataRowView;
 
             // 選択行からセッションID、クエリテキストを取得
             sessionId = dataContext.Row[0].ToString();
@@ -330,27 +299,88 @@ namespace DBKeeper
 
         private void DisplayDiskQueryIoListButton_Click(object sender, RoutedEventArgs e)
         {
-            // 各リストテーブルの内容をクリア
-            m_table_high_cost_query_list.Clear();
-
             // データ取得＆グリッド反映
-            ViewDiskIoHighCostList();
-
-            // データコンテキストの設定
-            LogicalReadHighCostQueryList.DataContext = m_table_high_cost_query_list;
+            ViewDataFileIOList();
 
         }
 
         private void DisplayExecutingQueryListButton_Click(object sender, RoutedEventArgs e)
         {
-            // 各リストテーブルの内容をクリア
-            m_table_query_list.Clear();
-
             // データ取得＆グリッド反映
             ViewExecutingQueryList();
-
-            // データコンテキストの設定
-            ExecutingQueryList.DataContext = m_table_query_list;
         }
+
+        /// <summary>
+        /// ListViewのソート
+        /// </summary>
+        /// <param name="listView">対象のListView</param>
+        /// <param name="headerTagName">ソートする列のタグ名</param>
+        /// <param name="IsMultiSort">True:複合列でのソート、False:単数列でのソート</param>
+        public void SortListView(ListView listView, string headerTagName, bool IsMultiSort)
+        {
+            // 対象のListViewが何もなければ処理終了
+            if (listView.Items == null && listView.Items.Count == 0)
+            {
+                return;
+            }
+
+            // SortDescriptionの取得
+            var r = listView.Items.SortDescriptions.Where(x => x.PropertyName == headerTagName);
+
+            ListSortDirection sort;
+
+            // 昇順・降順の設定
+            if (r.Count() == 0)
+            {
+                // 新規に降順として作成
+                sort = ListSortDirection.Descending;
+            }
+            else
+            {
+                // 既存のSortObjectがある場合は、前回実行結果と比較したうえで逆を設定
+                sort = (r.First().Direction == ListSortDirection.Descending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
+                listView.Items.SortDescriptions.Remove(r.First());
+            }
+
+            // 複合列ソートの判断
+            if (IsMultiSort == false)
+            {
+                // ソート内容の詳細をクリア
+                listView.Items.SortDescriptions.Clear();
+            }
+
+            listView.Items.SortDescriptions.Add(new SortDescription(headerTagName, sort));
+        }
+    }
+
+    class QueryListRecord
+    {
+        public string session_id { get; set; }
+        public string wait_type { get; set; }
+        public string wait_time { get; set; }
+        public string last_wait_type { get; set; }
+        public string wait_resource { get; set; }
+        public string query_text { get; set; }
+    }
+
+    class DataFileIoList
+    {
+        public string collection_time { get; set; }
+        public string database_name { get; set; }
+        public string file_name { get; set; }
+        public double total_read_mb { get; set; }
+        public double total_write_mb { get; set; }
+        public string total_io_count { get; set; }
+        public double total_io_wait_time { get; set; }
+        public string file_size_mb { get; set; }
+    }
+
+    class DataFileIoListViewClass
+    {
+        public string database_name { get; set; }
+        public string file_name { get; set; }
+        public double total_read_mb { get; set; }
+        public double total_write_mb { get; set; }
+        public double total_io_wait_time { get; set; }
     }
 }
