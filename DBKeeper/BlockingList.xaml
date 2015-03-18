@@ -1,0 +1,151 @@
+﻿<Window x:Class="DBKeeper.BlockingList"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SQL Serverデータベース監視ツール ～DBKeeper～ - ブロッキング情報" Height="800" Width="1200" Loaded="onLoaded" WindowStartupLocation="CenterOwner" Icon="Resources/DBkeeper.ico">
+    <Grid>
+        <DataGrid Name="BlockingListGrid" HorizontalAlignment="Left" AutoGenerateColumns="False" ItemsSource="{Binding}" Height="680" Margin="10,10,10,10" VerticalAlignment="Top" Width="auto" LoadingRow="BlockingListGrid_LoadingRow" >
+            <DataGrid.ItemContainerStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding isblocked}" Value="True">
+                            <Setter Property="Background" Value="LightPink" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.ItemContainerStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="セッションID"
+                    x:Name="col_session_id"
+                    Binding="{Binding session_id}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="ユーザープロセス"
+                    x:Name="col_is_userprocess"
+                    Binding="{Binding is_user_process}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="ログインID"
+                    x:Name="col_login_id"
+                    Binding="{Binding login_id}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="データベース"
+                    x:Name="col_db_name"
+                    Binding="{Binding db_name}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="タスクの状態"
+                    x:Name="col_task_state"
+                    Binding="{Binding task_state}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="コマンド"
+                    x:Name="col_sql_command"
+                    Binding="{Binding sql_command}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="アプリケーション"
+                    x:Name="col_application_name"
+                    Binding="{Binding application_name}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機時間(ミリ秒)"
+                    x:Name="col_wait_time_ms"
+                    Binding="{Binding wait_time_ms}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機の種類"
+                    x:Name="col_wait_type"
+                    Binding="{Binding wait_type}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="待機リソース"
+                    x:Name="col_wait_resource"
+                    Binding="{Binding wait_resource}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="ブロック元"
+                    x:Name="col_blocking_from"
+                    Binding="{Binding blocking_from}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="先頭ブロック"
+                    x:Name="col_top_block"
+                    Binding="{Binding top_block}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="メモリ使用量(KB)"
+                    x:Name="col_memory_usage"
+                    Binding="{Binding memory_usage}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="ホスト名"
+                    x:Name="col_host_name"
+                    Binding="{Binding host_name}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="IPアドレス"
+                    x:Name="col_client_net_address"
+                    Binding="{Binding client_net_address}"
+                    IsReadOnly="True"
+                />
+                <DataGridTextColumn
+                    CanUserReorder="True"
+                    CanUserSort="True"
+                    Header="Workload Group"
+                    x:Name="col_workload_group"
+                    Binding="{Binding workload_group}"
+                    IsReadOnly="True"
+                />
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Right" Height="28" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Click="CloseButton_Click"/>
+        <Button x:Name="RefleshButton" Content="更新" HorizontalAlignment="Left" Height="28" Margin="10,10,10,10" VerticalAlignment="Bottom" Width="100" Click="RefleshButton_Click"/>
+
+    </Grid>
+</Window>
